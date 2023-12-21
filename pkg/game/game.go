@@ -1,13 +1,16 @@
 package game
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"goSnake/pkg/config"
 	"goSnake/pkg/image_manager"
 	"goSnake/pkg/input"
 	"goSnake/pkg/snake"
 	"goSnake/pkg/utils/vector"
+	"math/rand"
 	"time"
 )
 
@@ -79,10 +82,25 @@ func (g *Game) Update() error {
 				Y: g.snake.Pos.Y + 32,
 			}
 		}
+		if newPos.X < 0 ||
+			newPos.Y < 0 ||
+			newPos.X+config.TileSize > config.ScreenWidth ||
+			newPos.Y+config.TileSize > config.ScreenHeight {
+			return errors.New("you died")
+		}
+
+		s := g.snake.Next
+		for s != nil {
+			if s.Pos == newPos {
+				return errors.New("you died")
+			}
+			s = s.Next
+		}
 
 		g.snake.Move(newPos)
 		if g.snake.Pos == g.foodPos {
 			g.snake.Grow()
+			g.newFood()
 		}
 	default:
 	}
@@ -104,4 +122,23 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return outsideWidth, outsideHeight
+}
+
+func (g *Game) newFood() {
+	newFoodPos := vector.Vector{
+		X: float64(rand.Intn(config.ScreenWidth/config.TileSize) * config.TileSize),
+		Y: float64(rand.Intn(config.ScreenHeight/config.TileSize) * config.TileSize),
+	}
+	s := g.snake
+	for s != nil {
+		if s.Pos == newFoodPos {
+			fmt.Println("collision")
+			newFoodPos = vector.Vector{
+				X: float64(rand.Intn(config.ScreenWidth/config.TileSize) * config.TileSize),
+				Y: float64(rand.Intn(config.ScreenHeight/config.TileSize) * config.TileSize),
+			}
+		}
+		s = s.Next
+	}
+	g.foodPos = newFoodPos
 }

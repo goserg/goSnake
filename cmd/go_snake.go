@@ -3,12 +3,13 @@ package main
 import (
 	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
+	"goSnake/pkg/config"
 	"goSnake/pkg/game"
 	"os"
 )
 
 func main() {
-	ebiten.SetWindowSize(32*16*2, 32*9*2)
+	ebiten.SetWindowSize(config.ScreenWidth, config.ScreenHeight)
 	ebiten.SetWindowTitle("goSnake")
 	if err := run(); err != nil {
 		fmt.Println(err.Error())
