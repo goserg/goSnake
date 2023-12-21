@@ -7,16 +7,25 @@ import (
 )
 
 type Snake struct {
-	Pos   vector.Vector
-	Image *ebiten.Image
-	Next  *Snake
+	direction int
+	Pos       vector.Vector
+	Image     *ebiten.Image
+	Next      *Snake
 }
 
-func New() *Snake {
+func New(pos vector.Vector) *Snake {
 	var snake Snake
-
+	snake.Pos = pos
 	snake.Image = image_manager.Snake()
 	return &snake
+}
+
+func (s *Snake) Grow() {
+	if s.Next != nil {
+		s.Next.Grow()
+		return
+	}
+	s.Next = New(s.Pos)
 }
 
 func (s *Snake) Draw(screen *ebiten.Image) {
@@ -26,5 +35,13 @@ func (s *Snake) Draw(screen *ebiten.Image) {
 
 	if s.Next != nil {
 		s.Next.Draw(screen)
+	}
+}
+
+func (s *Snake) Move(pos vector.Vector) {
+	oldpos := s.Pos
+	s.Pos = pos
+	if s.Next != nil {
+		s.Next.Move(oldpos)
 	}
 }

@@ -14,8 +14,8 @@ import (
 const tileSize = 32
 
 type Game struct {
-	snake     *snake.Snake
 	direction int
+	snake     *snake.Snake
 
 	foodPos vector.Vector
 
@@ -24,7 +24,10 @@ type Game struct {
 
 func New() *Game {
 	var g Game
-	g.snake = snake.New()
+	g.snake = snake.New(vector.Vector{
+		X: 32,
+		Y: 32,
+	})
 
 	g.mainTicker = time.NewTicker(time.Second / 10)
 	g.foodPos = vector.Vector{
@@ -53,15 +56,33 @@ func (g *Game) Update() error {
 		if g.direction == input.No {
 			g.direction = input.Right
 		}
+		var newPos vector.Vector
 		switch g.direction {
 		case input.Left:
-			g.snake.Pos.X -= tileSize
+			newPos = vector.Vector{
+				X: g.snake.Pos.X - 32,
+				Y: g.snake.Pos.Y,
+			}
 		case input.Right:
-			g.snake.Pos.X += tileSize
+			newPos = vector.Vector{
+				X: g.snake.Pos.X + 32,
+				Y: g.snake.Pos.Y,
+			}
 		case input.Up:
-			g.snake.Pos.Y -= tileSize
+			newPos = vector.Vector{
+				X: g.snake.Pos.X,
+				Y: g.snake.Pos.Y - 32,
+			}
 		case input.Down:
-			g.snake.Pos.Y += tileSize
+			newPos = vector.Vector{
+				X: g.snake.Pos.X,
+				Y: g.snake.Pos.Y + 32,
+			}
+		}
+
+		g.snake.Move(newPos)
+		if g.snake.Pos == g.foodPos {
+			g.snake.Grow()
 		}
 	default:
 	}
