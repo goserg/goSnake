@@ -18,9 +18,10 @@ import (
 const tileSize = 32
 
 type Game struct {
-	direction int
-	snake     *snake.Snake
-	walls     []*wall.Wall
+	queuedDirection int
+	direction       int
+	snake           *snake.Snake
+	walls           []*wall.Wall
 
 	foodPos vector.Vector
 
@@ -51,19 +52,22 @@ func New() *Game {
 func (g *Game) Update() error {
 	input.Update()
 
+	switch g.direction {
+	case input.Left, input.Right:
+		if input.DirectionV() != input.No {
+			g.queuedDirection = input.DirectionV()
+		}
+	case input.Up, input.Down:
+		if input.DirectionH() != input.No {
+			g.queuedDirection = input.DirectionH()
+		}
+	}
+
 	select {
 	case <-g.mainTicker.C:
-		switch g.direction {
-		case input.Left, input.Right:
-			if input.DirectionV() != input.No {
-				g.direction = input.DirectionV()
-			}
-		case input.Up, input.Down:
-			if input.DirectionH() != input.No {
-				g.direction = input.DirectionH()
-			}
+		if g.queuedDirection != input.No {
+			g.direction = g.queuedDirection
 		}
-
 		if g.direction == input.No {
 			g.direction = input.Right
 		}

@@ -20,7 +20,7 @@ type manager struct {
 var m manager
 
 func Update() {
-	m.keysPressed = inpututil.AppendPressedKeys([]ebiten.Key{})
+	m.keysPressed = inpututil.AppendJustPressedKeys([]ebiten.Key{})
 }
 
 func IsLeftPressed() bool {
