@@ -43,7 +43,7 @@ func New() *Game {
 			Y: 4 * config.TileSize,
 		}),
 	}
-	g.mainTicker = time.NewTicker(time.Second / 10)
+	g.mainTicker = time.NewTicker(config.Tick)
 	g.newFood()
 	return &g
 }
