@@ -6,6 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"goSnake/pkg/image_manager"
 	"goSnake/pkg/input"
+	"goSnake/pkg/snake"
 	"goSnake/pkg/utils/vector"
 	"time"
 )
@@ -13,7 +14,7 @@ import (
 const tileSize = 32
 
 type Game struct {
-	snakePos  vector.Vector
+	snake     *snake.Snake
 	direction int
 
 	foodPos vector.Vector
@@ -23,6 +24,7 @@ type Game struct {
 
 func New() *Game {
 	var g Game
+	g.snake = snake.New()
 
 	g.mainTicker = time.NewTicker(time.Second / 10)
 	g.foodPos = vector.Vector{
@@ -53,13 +55,13 @@ func (g *Game) Update() error {
 		}
 		switch g.direction {
 		case input.Left:
-			g.snakePos.X -= tileSize
+			g.snake.Pos.X -= tileSize
 		case input.Right:
-			g.snakePos.X += tileSize
+			g.snake.Pos.X += tileSize
 		case input.Up:
-			g.snakePos.Y -= tileSize
+			g.snake.Pos.Y -= tileSize
 		case input.Down:
-			g.snakePos.Y += tileSize
+			g.snake.Pos.Y += tileSize
 		}
 	default:
 	}
@@ -67,9 +69,9 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	var snakeDrawOptions ebiten.DrawImageOptions
-	snakeDrawOptions.GeoM.Translate(g.snakePos.X, g.snakePos.Y)
-	screen.DrawImage(image_manager.Snake(), &snakeDrawOptions)
+	if g.snake != nil {
+		g.snake.Draw(screen)
+	}
 
 	var foodDrawOptions ebiten.DrawImageOptions
 	foodDrawOptions.GeoM.Translate(g.foodPos.X, g.foodPos.Y)
