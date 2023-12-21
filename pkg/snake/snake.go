@@ -16,7 +16,7 @@ type Snake struct {
 func New(pos vector.Vector) *Snake {
 	var snake Snake
 	snake.Pos = pos
-	snake.Image = image_manager.Snake()
+	snake.Image = image_manager.SnakeSingle()
 	return &snake
 }
 
