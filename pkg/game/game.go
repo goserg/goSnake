@@ -10,6 +10,7 @@ import (
 	"goSnake/pkg/input"
 	"goSnake/pkg/snake"
 	"goSnake/pkg/utils/vector"
+	"goSnake/pkg/wall"
 	"math/rand"
 	"time"
 )
@@ -19,6 +20,7 @@ const tileSize = 32
 type Game struct {
 	direction int
 	snake     *snake.Snake
+	walls     []*wall.Wall
 
 	foodPos vector.Vector
 
@@ -31,12 +33,18 @@ func New() *Game {
 		X: 32,
 		Y: 32,
 	})
-
-	g.mainTicker = time.NewTicker(time.Second / 10)
-	g.foodPos = vector.Vector{
-		X: tileSize * 10,
-		Y: tileSize * 10,
+	g.walls = []*wall.Wall{
+		wall.New(vector.Vector{
+			X: 10 * config.TileSize,
+			Y: 10 * config.TileSize,
+		}),
+		wall.New(vector.Vector{
+			X: 15 * config.TileSize,
+			Y: 4 * config.TileSize,
+		}),
 	}
+	g.mainTicker = time.NewTicker(time.Second / 10)
+	g.newFood()
 	return &g
 }
 
@@ -89,6 +97,12 @@ func (g *Game) Update() error {
 			return errors.New("you died")
 		}
 
+		for _, wall := range g.walls {
+			if wall.IsCollides(g.snake.Pos) {
+				return errors.New("you died")
+			}
+		}
+
 		s := g.snake.Next
 		for s != nil {
 			if s.Pos == newPos {
@@ -116,6 +130,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	foodDrawOptions.GeoM.Translate(g.foodPos.X, g.foodPos.Y)
 	screen.DrawImage(image_manager.Food(), &foodDrawOptions)
 
+	for _, wall := range g.walls {
+		wall.Draw(screen)
+	}
+
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %d", int(ebiten.ActualFPS())))
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("TPS: %d", int(ebiten.ActualTPS())), 0, 10)
 }
@@ -128,6 +146,12 @@ func (g *Game) newFood() {
 	newFoodPos := vector.Vector{
 		X: float64(rand.Intn(config.ScreenWidth/config.TileSize) * config.TileSize),
 		Y: float64(rand.Intn(config.ScreenHeight/config.TileSize) * config.TileSize),
+	}
+	for _, wall := range g.walls {
+		if wall.IsCollides(newFoodPos) {
+			g.newFood()
+			return
+		}
 	}
 	s := g.snake
 	for s != nil {

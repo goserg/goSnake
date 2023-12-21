@@ -2,6 +2,7 @@ package image_manager
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"goSnake/pkg/config"
 	"image/color"
 )
 
@@ -15,7 +16,7 @@ func Snake() *ebiten.Image {
 	if img, ok := manager["snake"]; ok {
 		return img
 	}
-	img := ebiten.NewImage(32, 32)
+	img := ebiten.NewImage(config.TileSize, config.TileSize)
 	img.Fill(color.RGBA{
 		R: 200,
 		G: 200,
@@ -30,13 +31,28 @@ func Food() *ebiten.Image {
 	if img, ok := manager["food"]; ok {
 		return img
 	}
-	img := ebiten.NewImage(32, 32)
+	img := ebiten.NewImage(config.TileSize, config.TileSize)
+	img.Fill(color.RGBA{
+		R: 0,
+		G: 200,
+		B: 0,
+		A: 0,
+	})
+	manager["food"] = img
+	return img
+}
+
+func Wall() *ebiten.Image {
+	if img, ok := manager["wall"]; ok {
+		return img
+	}
+	img := ebiten.NewImage(config.TileSize, config.TileSize)
 	img.Fill(color.RGBA{
 		R: 200,
 		G: 0,
 		B: 0,
 		A: 0,
 	})
-	manager["food"] = img
+	manager["wall"] = img
 	return img
 }
