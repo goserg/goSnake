@@ -33,23 +33,23 @@ func SnakeSingle() *ebiten.Image {
 	}
 	img := ebiten.NewImage(config.TileSize, config.TileSize)
 	img.Fill(color.RGBA{
-		R: 200,
-		G: 200,
-		B: 0,
-		A: 0,
+		R: 210,
+		G: 210,
+		B: 4,
+		A: 255,
 	})
 	for x := 0; x < img.Bounds().Dx(); x++ {
 		img.Set(x, 0, color.RGBA{
 			R: 255,
 			G: 255,
 			B: 0,
-			A: 0,
+			A: 255,
 		})
 		img.Set(x, img.Bounds().Dy()-1, color.RGBA{
 			R: 255,
 			G: 255,
 			B: 0,
-			A: 0,
+			A: 255,
 		})
 	}
 	for y := 0; y < img.Bounds().Dy(); y++ {
@@ -91,11 +91,41 @@ func Wall() *ebiten.Image {
 	}
 	img := ebiten.NewImage(config.TileSize, config.TileSize)
 	img.Fill(color.RGBA{
-		R: 200,
-		G: 0,
-		B: 0,
-		A: 0,
+		R: 204,
+		G: 4,
+		B: 4,
+		A: 255,
 	})
 	manager["wall"] = img
+	return img
+}
+
+func Grid() *ebiten.Image {
+	if img, ok := manager["grid"]; ok {
+		return img
+	}
+	img := ebiten.NewImage(config.ScreenWidth, config.ScreenHeight)
+
+	for x := 0; x < config.ScreenWidth; x += config.TileSize {
+		for y := 0; y < config.ScreenHeight; y++ {
+			img.Set(x, y, color.RGBA{
+				R: 10,
+				G: 10,
+				B: 10,
+				A: 0,
+			})
+		}
+	}
+	for y := 0; y < config.ScreenHeight; y += config.TileSize {
+		for x := 0; x < config.ScreenWidth; x++ {
+			img.Set(x, y, color.RGBA{
+				R: 10,
+				G: 10,
+				B: 10,
+				A: 0,
+			})
+		}
+	}
+	manager["grid"] = img
 	return img
 }

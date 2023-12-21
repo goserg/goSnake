@@ -18,6 +18,7 @@ import (
 const tileSize = 32
 
 type Game struct {
+	grid            *ebiten.Image
 	queuedDirection int
 	direction       int
 	snake           *snake.Snake
@@ -30,6 +31,7 @@ type Game struct {
 
 func New() *Game {
 	var g Game
+	g.grid = image_manager.Grid()
 	g.snake = snake.New(vector.Vector{
 		X: 32,
 		Y: 32,
@@ -126,6 +128,8 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	screen.DrawImage(g.grid, nil)
+
 	if g.snake != nil {
 		g.snake.Draw(screen)
 	}
