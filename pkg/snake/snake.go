@@ -40,7 +40,7 @@ func (s *Snake) Draw(screen *ebiten.Image, tick time.Duration) {
 	prevPos := s.PrevPos
 	pos := s.Pos
 	switch {
-	case prevPos.X == 0 && s.Pos.X == config.ScreenWidth-config.TileSize:
+	case prevPos.X == 0 && s.Pos.X == config.FieldWidth-config.TileSize:
 		pos.X = -config.TileSize
 		var visualPos vector.Vector
 		visualPos.X = prevPos.X + (pos.X-prevPos.X)*movedPart
@@ -50,9 +50,9 @@ func (s *Snake) Draw(screen *ebiten.Image, tick time.Duration) {
 		snakeDrawOptions.GeoM.Translate(visualPos.X, visualPos.Y)
 		screen.DrawImage(s.Image, &snakeDrawOptions)
 
-		prevPos.X = config.ScreenWidth
-	case prevPos.X == config.ScreenWidth-config.TileSize && s.Pos.X == 0:
-		pos.X = config.ScreenWidth
+		prevPos.X = config.FieldWidth
+	case prevPos.X == config.FieldWidth-config.TileSize && s.Pos.X == 0:
+		pos.X = config.FieldWidth
 		var visualPos vector.Vector
 		visualPos.X = prevPos.X + (pos.X-prevPos.X)*movedPart
 		visualPos.Y = prevPos.Y + (pos.Y-prevPos.Y)*movedPart
@@ -62,7 +62,7 @@ func (s *Snake) Draw(screen *ebiten.Image, tick time.Duration) {
 		screen.DrawImage(s.Image, &snakeDrawOptions)
 
 		prevPos.X = -config.TileSize
-	case prevPos.Y == 0 && s.Pos.Y == config.ScreenHeight-config.TileSize:
+	case prevPos.Y == 0 && s.Pos.Y == config.FieldHeight-config.TileSize:
 		pos.Y = -config.TileSize
 		var visualPos vector.Vector
 		visualPos.X = prevPos.X + (pos.X-prevPos.X)*movedPart
@@ -72,9 +72,9 @@ func (s *Snake) Draw(screen *ebiten.Image, tick time.Duration) {
 		snakeDrawOptions.GeoM.Translate(visualPos.X, visualPos.Y)
 		screen.DrawImage(s.Image, &snakeDrawOptions)
 
-		prevPos.Y = config.ScreenHeight
-	case prevPos.Y == config.ScreenHeight-config.TileSize && s.Pos.Y == 0:
-		pos.Y = config.ScreenHeight
+		prevPos.Y = config.FieldHeight
+	case prevPos.Y == config.FieldHeight-config.TileSize && s.Pos.Y == 0:
+		pos.Y = config.FieldHeight
 		var visualPos vector.Vector
 		visualPos.X = prevPos.X + (pos.X-prevPos.X)*movedPart
 		visualPos.Y = prevPos.Y + (pos.Y-prevPos.Y)*movedPart

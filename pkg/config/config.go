@@ -5,4 +5,10 @@ const (
 
 	ScreenWidth  = TileSize * 16 * 2
 	ScreenHeight = TileSize * 9 * 2
+
+	FieldLeft  = TileSize
+	FieldWidth = TileSize * 16
+
+	FieldTop    = TileSize
+	FieldHeight = TileSize * 16
 )

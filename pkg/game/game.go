@@ -10,6 +10,7 @@ import (
 	"goSnake/pkg/input"
 	"goSnake/pkg/snake"
 	"goSnake/pkg/utils/vector"
+	"image/color"
 	"math/rand"
 	"time"
 )
@@ -35,8 +36,8 @@ func New() *Game {
 	g.speed = 10
 	g.grid = image_manager.Grid()
 	g.snake = snake.New(vector.Vector{
-		X: 32,
-		Y: 32,
+		X: 32 * 5,
+		Y: 32 * 5,
 	})
 	g.mainTicker = time.NewTicker(calcTick(g.speed))
 	g.newFood()
@@ -90,12 +91,12 @@ func (g *Game) Update() error {
 		}
 		switch {
 		case newPos.X < 0:
-			newPos.X = config.ScreenWidth - config.TileSize
+			newPos.X = config.FieldWidth - config.TileSize
 		case newPos.Y < 0:
-			newPos.Y = config.ScreenHeight - config.TileSize
-		case newPos.X+config.TileSize > config.ScreenWidth:
+			newPos.Y = config.FieldHeight - config.TileSize
+		case newPos.X+config.TileSize > config.FieldWidth:
 			newPos.X = 0
-		case newPos.Y+config.TileSize > config.ScreenHeight:
+		case newPos.Y+config.TileSize > config.FieldHeight:
 			newPos.Y = 0
 		}
 
@@ -118,15 +119,21 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.DrawImage(g.grid, nil)
+	snakeField := ebiten.NewImage(config.FieldWidth+1, config.FieldHeight+1)
+	snakeField.Fill(color.RGBA{10, 10, 10, 0})
 
+	snakeField.DrawImage(g.grid, nil)
 	if g.snake != nil {
-		g.snake.Draw(screen, calcTick(g.speed))
+		g.snake.Draw(snakeField, calcTick(g.speed))
 	}
 
 	var foodDrawOptions ebiten.DrawImageOptions
 	foodDrawOptions.GeoM.Translate(g.foodPos.X, g.foodPos.Y)
-	screen.DrawImage(image_manager.Food(), &foodDrawOptions)
+	snakeField.DrawImage(image_manager.Food(), &foodDrawOptions)
+
+	var snakeFieldDrawingOptions ebiten.DrawImageOptions
+	snakeFieldDrawingOptions.GeoM.Translate(config.FieldLeft, config.FieldTop)
+	screen.DrawImage(snakeField, &snakeFieldDrawingOptions)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %d", int(ebiten.ActualFPS())))
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("TPS: %d", int(ebiten.ActualTPS())), 0, 10)
@@ -139,8 +146,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 
 func (g *Game) newFood() {
 	newFoodPos := vector.Vector{
-		X: float64(rand.Intn(config.ScreenWidth/config.TileSize) * config.TileSize),
-		Y: float64(rand.Intn(config.ScreenHeight/config.TileSize) * config.TileSize),
+		X: float64(rand.Intn(config.FieldWidth/config.TileSize) * config.TileSize),
+		Y: float64(rand.Intn(config.FieldHeight/config.TileSize) * config.TileSize),
 	}
 
 	s := g.snake
@@ -148,8 +155,8 @@ func (g *Game) newFood() {
 		if s.Pos == newFoodPos {
 			fmt.Println("collision")
 			newFoodPos = vector.Vector{
-				X: float64(rand.Intn(config.ScreenWidth/config.TileSize) * config.TileSize),
-				Y: float64(rand.Intn(config.ScreenHeight/config.TileSize) * config.TileSize),
+				X: float64(rand.Intn(config.FieldWidth/config.TileSize) * config.TileSize),
+				Y: float64(rand.Intn(config.FieldHeight/config.TileSize) * config.TileSize),
 			}
 		}
 		s = s.Next

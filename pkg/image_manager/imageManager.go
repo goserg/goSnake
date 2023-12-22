@@ -106,22 +106,22 @@ func Grid() *ebiten.Image {
 	}
 	img := ebiten.NewImage(config.ScreenWidth, config.ScreenHeight)
 
-	for x := 0; x < config.ScreenWidth; x += config.TileSize {
-		for y := 0; y < config.ScreenHeight; y++ {
+	for x := 0; x < config.FieldWidth+config.TileSize; x += config.TileSize {
+		for y := 0; y < config.FieldHeight; y++ {
 			img.Set(x, y, color.RGBA{
-				R: 10,
-				G: 10,
-				B: 10,
+				R: 20,
+				G: 20,
+				B: 20,
 				A: 0,
 			})
 		}
 	}
-	for y := 0; y < config.ScreenHeight; y += config.TileSize {
-		for x := 0; x < config.ScreenWidth; x++ {
+	for y := 0; y < config.FieldHeight+config.TileSize; y += config.TileSize {
+		for x := 0; x < config.FieldWidth; x++ {
 			img.Set(x, y, color.RGBA{
-				R: 10,
-				G: 10,
-				B: 10,
+				R: 20,
+				G: 20,
+				B: 20,
 				A: 0,
 			})
 		}
