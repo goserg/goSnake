@@ -2,7 +2,6 @@ package snake
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"goSnake/pkg/config"
 	"goSnake/pkg/image_manager"
 	"goSnake/pkg/utils/vector"
 	"time"
@@ -33,10 +32,10 @@ func (s *Snake) Grow() {
 	s.Next = New(s.PrevPos)
 }
 
-func (s *Snake) Draw(screen *ebiten.Image) {
+func (s *Snake) Draw(screen *ebiten.Image, tick time.Duration) {
 	var visualPos vector.Vector
 	nowTime := time.Now().Sub(s.MoveStarted)
-	movedPart := float64(nowTime) / float64(config.Tick)
+	movedPart := float64(nowTime) / float64(tick)
 	visualPos.X = s.PrevPos.X + (s.Pos.X-s.PrevPos.X)*movedPart
 	visualPos.Y = s.PrevPos.Y + (s.Pos.Y-s.PrevPos.Y)*movedPart
 
@@ -45,7 +44,7 @@ func (s *Snake) Draw(screen *ebiten.Image) {
 	screen.DrawImage(s.Image, &snakeDrawOptions)
 
 	if s.Next != nil {
-		s.Next.Draw(screen)
+		s.Next.Draw(screen, tick)
 	}
 }
 
