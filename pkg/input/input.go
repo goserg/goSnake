@@ -23,7 +23,7 @@ func Update() {
 	m.keysPressed = inpututil.AppendJustPressedKeys([]ebiten.Key{})
 }
 
-func IsLeftPressed() bool {
+func IsLeftJustPressed() bool {
 	for _, key := range m.keysPressed {
 		if ebiten.KeyLeft == key {
 			return true
@@ -31,7 +31,7 @@ func IsLeftPressed() bool {
 	}
 	return false
 }
-func IsRightPressed() bool {
+func IsRightJustPressed() bool {
 	for _, key := range m.keysPressed {
 		if ebiten.KeyRight == key {
 			return true
@@ -39,7 +39,7 @@ func IsRightPressed() bool {
 	}
 	return false
 }
-func IsUpPressed() bool {
+func IsUpJustPressed() bool {
 	for _, key := range m.keysPressed {
 		if ebiten.KeyUp == key {
 			return true
@@ -47,7 +47,7 @@ func IsUpPressed() bool {
 	}
 	return false
 }
-func IsDownPressed() bool {
+func IsDownJustPressed() bool {
 	for _, key := range m.keysPressed {
 		if ebiten.KeyDown == key {
 			return true
@@ -58,10 +58,10 @@ func IsDownPressed() bool {
 
 func DirectionH() int {
 	var dir int
-	if IsLeftPressed() {
+	if IsLeftJustPressed() {
 		dir -= 1
 	}
-	if IsRightPressed() {
+	if IsRightJustPressed() {
 		dir += 1
 	}
 	if dir == 1 {
@@ -75,10 +75,10 @@ func DirectionH() int {
 
 func DirectionV() int {
 	var dir int
-	if IsUpPressed() {
+	if IsUpJustPressed() {
 		dir -= 1
 	}
-	if IsDownPressed() {
+	if IsDownJustPressed() {
 		dir += 1
 	}
 	if dir == 1 {
@@ -88,4 +88,8 @@ func DirectionV() int {
 		return Up
 	}
 	return No
+}
+
+func IsF1Pressed() bool {
+	return inpututil.IsKeyJustPressed(ebiten.KeyF1)
 }

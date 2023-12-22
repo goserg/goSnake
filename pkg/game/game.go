@@ -13,11 +13,14 @@ import (
 )
 
 type Game struct {
-	snakeField *snakeField.SnakeField
+	snakeField     *snakeField.SnakeField
+	isDebugVisible bool
 }
 
 func New() *Game {
 	var g Game
+
+	g.isDebugVisible = true
 
 	g.snakeField = snakeField.New()
 	g.snakeField.DeathCallback = g.OnDeath
@@ -28,6 +31,9 @@ func New() *Game {
 func (g *Game) Update() error {
 	input.Update()
 	text.Update()
+	if input.IsF1Pressed() {
+		g.isDebugVisible = !g.isDebugVisible
+	}
 
 	if err := g.snakeField.Update(); err != nil {
 		return err
@@ -40,8 +46,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	snakeFieldDrawingOptions.GeoM.Translate(config.FieldLeft, config.FieldTop)
 	g.snakeField.Draw(screen, &snakeFieldDrawingOptions)
 
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %d", int(ebiten.ActualFPS())))
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("TPS: %d", int(ebiten.ActualTPS())), 0, 10)
+	if g.isDebugVisible {
+		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %d", int(ebiten.ActualFPS())))
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("TPS: %d", int(ebiten.ActualTPS())), 0, 10)
+	}
 
 	text.Draw(screen)
 }
