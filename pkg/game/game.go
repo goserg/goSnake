@@ -5,6 +5,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"goSnake/pkg/config"
+	"goSnake/pkg/enemy"
 	"goSnake/pkg/input"
 	snakeField "goSnake/pkg/snake_field"
 	"goSnake/pkg/text"
@@ -15,6 +16,8 @@ import (
 type Game struct {
 	snakeField     *snakeField.SnakeField
 	isDebugVisible bool
+
+	enemy *enemy.Enemy
 }
 
 func New() *Game {
@@ -23,8 +26,10 @@ func New() *Game {
 	g.isDebugVisible = true
 
 	g.snakeField = snakeField.New()
-	g.snakeField.DeathCallback = g.OnDeath
+	g.snakeField.DeathCallback = g.onDeath
+	g.snakeField.EatCallback = g.onSnakeEat
 
+	g.enemy = enemy.New(g.onEnemyAttack, g.onEnemyDeath)
 	return &g
 }
 
@@ -38,6 +43,8 @@ func (g *Game) Update() error {
 	if err := g.snakeField.Update(); err != nil {
 		return err
 	}
+
+	g.enemy.Update()
 	return nil
 }
 
@@ -58,12 +65,37 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return outsideWidth, outsideHeight
 }
 
-func (g *Game) OnDeath() {
+func (g *Game) onSnakeEat() {
+	g.enemy.Damage(10)
+}
+
+func (g *Game) onDeath() {
 	g.snakeField = snakeField.New()
-	g.snakeField.DeathCallback = g.OnDeath
+	g.snakeField.DeathCallback = g.onDeath
+	g.snakeField.EatCallback = g.onSnakeEat
+	g.enemy = enemy.New(g.onEnemyAttack, g.onEnemyDeath)
 
 	text.New("YOU DIED", 200, 200,
 		text.WithColor(colornames.Red),
+		text.WithSize(100),
+		text.WithFadeout(),
+		text.WithMove(0, -0.5),
+		text.WithLifespan(time.Second),
+	)
+}
+
+func (g *Game) onEnemyAttack() {
+	g.snakeField.GrowSnake()
+}
+
+func (g *Game) onEnemyDeath() {
+	g.snakeField = snakeField.New()
+	g.snakeField.DeathCallback = g.onDeath
+	g.snakeField.EatCallback = g.onSnakeEat
+	g.enemy = enemy.New(g.onEnemyAttack, g.onEnemyDeath)
+
+	text.New("YOU WIN", 200, 200,
+		text.WithColor(colornames.Greenyellow),
 		text.WithSize(100),
 		text.WithFadeout(),
 		text.WithMove(0, -0.5),

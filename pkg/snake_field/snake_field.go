@@ -26,6 +26,7 @@ type SnakeField struct {
 	mainTicker *time.Ticker
 
 	DeathCallback func()
+	EatCallback   func()
 }
 
 func New() *SnakeField {
@@ -109,6 +110,7 @@ func (sf *SnakeField) Update() error {
 
 		sf.snake.Move(newPos)
 		if sf.snake.Pos == sf.foodPos {
+			sf.EatCallback()
 			sf.snake.Grow()
 			sf.newFood()
 		}
@@ -156,6 +158,10 @@ func (sf *SnakeField) newFood() {
 func (sf *SnakeField) SpeedUp() {
 	sf.speed++
 	sf.mainTicker = time.NewTicker(calcTick(sf.speed))
+}
+
+func (sf *SnakeField) GrowSnake() {
+	sf.snake.Grow()
 }
 
 func calcTick(speed int) time.Duration {
