@@ -10,7 +10,6 @@ import (
 	"goSnake/pkg/input"
 	"goSnake/pkg/snake"
 	"goSnake/pkg/utils/vector"
-	"goSnake/pkg/wall"
 	"math/rand"
 	"time"
 )
@@ -24,7 +23,6 @@ type Game struct {
 	queuedDirection int
 	direction       int
 	snake           *snake.Snake
-	walls           []*wall.Wall
 
 	foodPos vector.Vector
 
@@ -40,16 +38,6 @@ func New() *Game {
 		X: 32,
 		Y: 32,
 	})
-	g.walls = []*wall.Wall{
-		wall.New(vector.Vector{
-			X: 10 * config.TileSize,
-			Y: 10 * config.TileSize,
-		}),
-		wall.New(vector.Vector{
-			X: 15 * config.TileSize,
-			Y: 4 * config.TileSize,
-		}),
-	}
 	g.mainTicker = time.NewTicker(calcTick(g.speed))
 	g.newFood()
 	return &g
@@ -100,17 +88,15 @@ func (g *Game) Update() error {
 				Y: g.snake.Pos.Y + 32,
 			}
 		}
-		if newPos.X < 0 ||
-			newPos.Y < 0 ||
-			newPos.X+config.TileSize > config.ScreenWidth ||
-			newPos.Y+config.TileSize > config.ScreenHeight {
-			return errors.New("you died")
-		}
-
-		for _, wall := range g.walls {
-			if wall.IsCollides(g.snake.Pos) {
-				return errors.New("you died")
-			}
+		switch {
+		case newPos.X < 0:
+			newPos.X = config.ScreenWidth - config.TileSize
+		case newPos.Y < 0:
+			newPos.Y = config.ScreenHeight - config.TileSize
+		case newPos.X+config.TileSize > config.ScreenWidth:
+			newPos.X = 0
+		case newPos.Y+config.TileSize > config.ScreenHeight:
+			newPos.Y = 0
 		}
 
 		s := g.snake.Next
@@ -142,12 +128,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	foodDrawOptions.GeoM.Translate(g.foodPos.X, g.foodPos.Y)
 	screen.DrawImage(image_manager.Food(), &foodDrawOptions)
 
-	for _, wall := range g.walls {
-		wall.Draw(screen)
-	}
-
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %d", int(ebiten.ActualFPS())))
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("TPS: %d", int(ebiten.ActualTPS())), 0, 10)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("speed: %d", g.speed), 0, 20)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -159,12 +142,7 @@ func (g *Game) newFood() {
 		X: float64(rand.Intn(config.ScreenWidth/config.TileSize) * config.TileSize),
 		Y: float64(rand.Intn(config.ScreenHeight/config.TileSize) * config.TileSize),
 	}
-	for _, wall := range g.walls {
-		if wall.IsCollides(newFoodPos) {
-			g.newFood()
-			return
-		}
-	}
+
 	s := g.snake
 	for s != nil {
 		if s.Pos == newFoodPos {
