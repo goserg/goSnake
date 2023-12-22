@@ -3,6 +3,7 @@ package input
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"log"
 )
 
 const (
@@ -14,13 +15,40 @@ const (
 )
 
 type manager struct {
-	keysPressed []ebiten.Key
+	keysPressed    []ebiten.Key
+	buttonsPressed []ebiten.GamepadButton
+	gamepadIDsBuf  []ebiten.GamepadID
+	gamepadIDs     map[ebiten.GamepadID]struct{}
+}
+
+func init() {
+	m = manager{gamepadIDs: map[ebiten.GamepadID]struct{}{}}
 }
 
 var m manager
 
 func Update() {
 	m.keysPressed = inpututil.AppendJustPressedKeys([]ebiten.Key{})
+
+	// Log the gamepad connection events.
+	m.gamepadIDsBuf = inpututil.AppendJustConnectedGamepadIDs(m.gamepadIDsBuf[:0])
+	for _, id := range m.gamepadIDsBuf {
+		log.Printf("gamepad connected: id: %d, SDL ID: %s", id, ebiten.GamepadSDLID(id))
+		m.gamepadIDs[id] = struct{}{}
+	}
+	for id := range m.gamepadIDs {
+		if inpututil.IsGamepadJustDisconnected(id) {
+			log.Printf("gamepad disconnected: id: %d", id)
+			delete(m.gamepadIDs, id)
+		}
+	}
+	m.buttonsPressed = []ebiten.GamepadButton{}
+	for id := range m.gamepadIDs {
+		pressed := inpututil.AppendJustPressedGamepadButtons(id, []ebiten.GamepadButton{})
+		for _, button := range pressed {
+			m.buttonsPressed = append(m.buttonsPressed, button)
+		}
+	}
 }
 
 func IsLeftJustPressed() bool {
@@ -29,11 +57,22 @@ func IsLeftJustPressed() bool {
 			return true
 		}
 	}
+	for _, button := range m.buttonsPressed {
+		if ebiten.GamepadButton13 == button {
+			return true
+		}
+	}
+
 	return false
 }
 func IsRightJustPressed() bool {
 	for _, key := range m.keysPressed {
 		if ebiten.KeyRight == key {
+			return true
+		}
+	}
+	for _, button := range m.buttonsPressed {
+		if ebiten.GamepadButton11 == button {
 			return true
 		}
 	}
@@ -45,11 +84,21 @@ func IsUpJustPressed() bool {
 			return true
 		}
 	}
+	for _, button := range m.buttonsPressed {
+		if ebiten.GamepadButton10 == button {
+			return true
+		}
+	}
 	return false
 }
 func IsDownJustPressed() bool {
 	for _, key := range m.keysPressed {
 		if ebiten.KeyDown == key {
+			return true
+		}
+	}
+	for _, button := range m.buttonsPressed {
+		if ebiten.GamepadButton12 == button {
 			return true
 		}
 	}
