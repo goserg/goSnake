@@ -2,6 +2,7 @@ package enemy
 
 import (
 	"fmt"
+	"goSnake/pkg/engine/signal"
 	"time"
 )
 
@@ -14,11 +15,13 @@ type Enemy struct {
 	nextAttack time.Time
 
 	attackCallback func()
-	deathCallback  func()
+	EventDeath     signal.Event[EventDeathData]
 }
 
-func New(attackCallback func(),
-	deathCallback func()) *Enemy {
+type EventDeathData struct {
+}
+
+func New(attackCallback func()) *Enemy {
 	var enemy Enemy
 	enemy.name = "rat"
 	enemy.maxHP = 100
@@ -26,7 +29,6 @@ func New(attackCallback func(),
 	enemy.cooldown = time.Second * 2
 	enemy.nextAttack = time.Now().Add(enemy.cooldown)
 	enemy.attackCallback = attackCallback
-	enemy.deathCallback = deathCallback
 
 	return &enemy
 }
@@ -42,6 +44,6 @@ func (e *Enemy) Update() {
 func (e *Enemy) Damage(dmg int) {
 	e.HP -= dmg
 	if e.HP <= 0 {
-		e.deathCallback()
+		e.EventDeath.Emit(EventDeathData{})
 	}
 }
