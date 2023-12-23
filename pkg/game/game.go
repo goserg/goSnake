@@ -20,6 +20,10 @@ type Game struct {
 	enemy *enemy.Enemy
 }
 
+func (g *Game) IsDisposed() bool {
+	return false
+}
+
 func New() *Game {
 	var g Game
 
@@ -27,7 +31,7 @@ func New() *Game {
 
 	g.snakeField = snakeField.New()
 	g.snakeField.DeathCallback = g.onDeath
-	g.snakeField.EatCallback = g.onSnakeEat
+	g.snakeField.EventEat.Connect(&g, g.OnSnakeEatEvent)
 
 	g.enemy = enemy.New(g.onEnemyAttack, g.onEnemyDeath)
 	return &g
@@ -65,14 +69,10 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return outsideWidth, outsideHeight
 }
 
-func (g *Game) onSnakeEat() {
-	g.enemy.Damage(10)
-}
-
 func (g *Game) onDeath() {
 	g.snakeField = snakeField.New()
 	g.snakeField.DeathCallback = g.onDeath
-	g.snakeField.EatCallback = g.onSnakeEat
+	g.snakeField.EventEat.Connect(g, g.OnSnakeEatEvent)
 	g.enemy = enemy.New(g.onEnemyAttack, g.onEnemyDeath)
 
 	text.New("YOU DIED", 200, 200,
@@ -91,7 +91,7 @@ func (g *Game) onEnemyAttack() {
 func (g *Game) onEnemyDeath() {
 	g.snakeField = snakeField.New()
 	g.snakeField.DeathCallback = g.onDeath
-	g.snakeField.EatCallback = g.onSnakeEat
+	g.snakeField.EventEat.Connect(g, g.OnSnakeEatEvent)
 	g.enemy = enemy.New(g.onEnemyAttack, g.onEnemyDeath)
 
 	text.New("YOU WIN", 200, 200,
@@ -101,4 +101,9 @@ func (g *Game) onEnemyDeath() {
 		text.WithMove(0, -0.5),
 		text.WithLifespan(time.Second),
 	)
+}
+
+func (g *Game) OnSnakeEatEvent(arg snakeField.EventEatData) {
+	fmt.Println("event eat", arg.Name)
+	g.enemy.Damage(10)
 }

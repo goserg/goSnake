@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"goSnake/pkg/config"
+	"goSnake/pkg/engine/signal"
 	"goSnake/pkg/image_manager"
 	"goSnake/pkg/input"
 	"goSnake/pkg/snake"
@@ -26,7 +27,12 @@ type SnakeField struct {
 	mainTicker *time.Ticker
 
 	DeathCallback func()
-	EatCallback   func()
+
+	EventEat signal.Event[EventEatData]
+}
+
+type EventEatData struct {
+	Name string
 }
 
 func New() *SnakeField {
@@ -110,7 +116,7 @@ func (sf *SnakeField) Update() error {
 
 		sf.snake.Move(newPos)
 		if sf.snake.Pos == sf.foodPos {
-			sf.EatCallback()
+			sf.EventEat.Emit(EventEatData{Name: "lol kek"})
 			sf.snake.Grow()
 			sf.newFood()
 		}
