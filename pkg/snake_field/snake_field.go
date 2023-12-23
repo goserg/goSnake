@@ -26,13 +26,15 @@ type SnakeField struct {
 
 	mainTicker *time.Ticker
 
-	DeathCallback func()
-
-	EventEat signal.Event[EventEatData]
+	EventEat   signal.Event[EventEatData]
+	EventDeath signal.Event[EventSnakeDeathData]
 }
 
 type EventEatData struct {
 	Name string
+}
+
+type EventSnakeDeathData struct {
 }
 
 func New() *SnakeField {
@@ -108,7 +110,7 @@ func (sf *SnakeField) Update() error {
 		s := sf.snake.Next
 		for s != nil {
 			if s.Pos == newPos {
-				sf.DeathCallback()
+				sf.EventDeath.Emit(EventSnakeDeathData{})
 				return nil
 			}
 			s = s.Next

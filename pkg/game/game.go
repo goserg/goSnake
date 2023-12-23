@@ -30,7 +30,7 @@ func New() *Game {
 	g.isDebugVisible = true
 
 	g.snakeField = snakeField.New()
-	g.snakeField.DeathCallback = g.onDeath
+	g.snakeField.EventDeath.Connect(&g, g.onDeath)
 	g.snakeField.EventEat.Connect(&g, g.OnSnakeEatEvent)
 
 	g.enemy = enemy.New(g.onEnemyAttack, g.onEnemyDeath)
@@ -69,9 +69,9 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return outsideWidth, outsideHeight
 }
 
-func (g *Game) onDeath() {
+func (g *Game) onDeath(data snakeField.EventSnakeDeathData) {
 	g.snakeField = snakeField.New()
-	g.snakeField.DeathCallback = g.onDeath
+	g.snakeField.EventDeath.Connect(g, g.onDeath)
 	g.snakeField.EventEat.Connect(g, g.OnSnakeEatEvent)
 	g.enemy = enemy.New(g.onEnemyAttack, g.onEnemyDeath)
 
@@ -90,7 +90,7 @@ func (g *Game) onEnemyAttack() {
 
 func (g *Game) onEnemyDeath() {
 	g.snakeField = snakeField.New()
-	g.snakeField.DeathCallback = g.onDeath
+	g.snakeField.EventDeath.Connect(g, g.onDeath)
 	g.snakeField.EventEat.Connect(g, g.OnSnakeEatEvent)
 	g.enemy = enemy.New(g.onEnemyAttack, g.onEnemyDeath)
 
