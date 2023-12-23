@@ -33,7 +33,8 @@ func New() *Game {
 	g.snakeField.EventDeath.Connect(&g, g.onDeath)
 	g.snakeField.EventEat.Connect(&g, g.OnSnakeEatEvent)
 
-	g.enemy = enemy.New(g.onEnemyAttack)
+	g.enemy = enemy.New()
+	g.enemy.EventAttack.Connect(&g, g.onEnemyAttack)
 	g.enemy.EventDeath.Connect(&g, g.onEnemyDeath)
 	return &g
 }
@@ -74,7 +75,8 @@ func (g *Game) onDeath(data snakeField.EventSnakeDeathData) {
 	g.snakeField = snakeField.New()
 	g.snakeField.EventDeath.Connect(g, g.onDeath)
 	g.snakeField.EventEat.Connect(g, g.OnSnakeEatEvent)
-	g.enemy = enemy.New(g.onEnemyAttack)
+	g.enemy = enemy.New()
+	g.enemy.EventAttack.Connect(g, g.onEnemyAttack)
 	g.enemy.EventDeath.Connect(g, g.onEnemyDeath)
 
 	text.New("YOU DIED", 200, 200,
@@ -86,7 +88,7 @@ func (g *Game) onDeath(data snakeField.EventSnakeDeathData) {
 	)
 }
 
-func (g *Game) onEnemyAttack() {
+func (g *Game) onEnemyAttack(data enemy.EventAttackData) {
 	g.snakeField.GrowSnake()
 }
 
@@ -94,7 +96,8 @@ func (g *Game) onEnemyDeath(data enemy.EventDeathData) {
 	g.snakeField = snakeField.New()
 	g.snakeField.EventDeath.Connect(g, g.onDeath)
 	g.snakeField.EventEat.Connect(g, g.OnSnakeEatEvent)
-	g.enemy = enemy.New(g.onEnemyAttack)
+	g.enemy = enemy.New()
+	g.enemy.EventAttack.Connect(g, g.onEnemyAttack)
 	g.enemy.EventDeath.Connect(g, g.onEnemyDeath)
 
 	text.New("YOU WIN", 200, 200,

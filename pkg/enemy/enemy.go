@@ -14,21 +14,22 @@ type Enemy struct {
 	cooldown   time.Duration
 	nextAttack time.Time
 
-	attackCallback func()
-	EventDeath     signal.Event[EventDeathData]
+	EventDeath  signal.Event[EventDeathData]
+	EventAttack signal.Event[EventAttackData]
 }
 
 type EventDeathData struct {
 }
+type EventAttackData struct {
+}
 
-func New(attackCallback func()) *Enemy {
+func New() *Enemy {
 	var enemy Enemy
 	enemy.name = "rat"
 	enemy.maxHP = 100
 	enemy.HP = 100
 	enemy.cooldown = time.Second * 2
 	enemy.nextAttack = time.Now().Add(enemy.cooldown)
-	enemy.attackCallback = attackCallback
 
 	return &enemy
 }
@@ -37,7 +38,7 @@ func (e *Enemy) Update() {
 	if time.Now().After(e.nextAttack) {
 		e.nextAttack = time.Now().Add(e.cooldown)
 		fmt.Printf("%s attack\n", e.name)
-		e.attackCallback()
+		e.EventAttack.Emit(EventAttackData{})
 	}
 }
 
