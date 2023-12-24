@@ -13,6 +13,14 @@ import (
 	"time"
 )
 
+const (
+	No = iota
+	Right
+	Down
+	Left
+	Up
+)
+
 type SnakeField struct {
 	speed int
 
@@ -25,6 +33,8 @@ type SnakeField struct {
 
 	mainTicker *time.Ticker
 
+	input *input.Handler
+
 	EventEat   signal.Event[EventEatData]
 	EventDeath signal.Event[EventSnakeDeathData]
 }
@@ -36,8 +46,10 @@ type EventEatData struct {
 type EventSnakeDeathData struct {
 }
 
-func New() *SnakeField {
+func New(inputHandler *input.Handler) *SnakeField {
 	var snakeField SnakeField
+
+	snakeField.input = inputHandler
 
 	snakeField.speed = 10
 	snakeField.grid = image_manager.Grid()
@@ -55,45 +67,53 @@ func New() *SnakeField {
 }
 
 func (sf *SnakeField) Update() error {
-	input.Update()
-
 	switch sf.direction {
-	case input.Left, input.Right:
-		if input.DirectionV() != input.No {
-			sf.queuedDirection = input.DirectionV()
+	case Left, Right:
+		if sf.input.IsActionJustPressed(input.ActionUp) {
+			sf.queuedDirection = Up
+			break
 		}
-	case input.Up, input.Down:
-		if input.DirectionH() != input.No {
-			sf.queuedDirection = input.DirectionH()
+		if sf.input.IsActionJustPressed(input.ActionDown) {
+			sf.queuedDirection = Down
+			break
+		}
+	case Up, Down:
+		if sf.input.IsActionJustPressed(input.ActionLeft) {
+			sf.queuedDirection = Left
+			break
+		}
+		if sf.input.IsActionJustPressed(input.ActionRight) {
+			sf.queuedDirection = Right
+			break
 		}
 	}
 
 	select {
 	case <-sf.mainTicker.C:
-		if sf.queuedDirection != input.No {
+		if sf.queuedDirection != No {
 			sf.direction = sf.queuedDirection
 		}
-		if sf.direction == input.No {
-			sf.direction = input.Right
+		if sf.direction == No {
+			sf.direction = Right
 		}
 		var newPos vector.Vector
 		switch sf.direction {
-		case input.Left:
+		case Left:
 			newPos = vector.Vector{
 				X: sf.snake.Pos.X - 32,
 				Y: sf.snake.Pos.Y,
 			}
-		case input.Right:
+		case Right:
 			newPos = vector.Vector{
 				X: sf.snake.Pos.X + 32,
 				Y: sf.snake.Pos.Y,
 			}
-		case input.Up:
+		case Up:
 			newPos = vector.Vector{
 				X: sf.snake.Pos.X,
 				Y: sf.snake.Pos.Y - 32,
 			}
-		case input.Down:
+		case Down:
 			newPos = vector.Vector{
 				X: sf.snake.Pos.X,
 				Y: sf.snake.Pos.Y + 32,

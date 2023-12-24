@@ -17,6 +17,8 @@ type Game struct {
 	snakeField     *snakeField.SnakeField
 	isDebugVisible bool
 
+	input *input.Handler
+
 	enemy *enemy.Enemy
 }
 
@@ -27,9 +29,12 @@ func (g *Game) IsDisposed() bool {
 func New() *Game {
 	var g Game
 
+	inputHandler := input.NewHandler()
+	g.input = inputHandler
+
 	g.isDebugVisible = true
 
-	g.snakeField = snakeField.New()
+	g.snakeField = snakeField.New(g.input)
 	g.snakeField.EventDeath.Connect(&g, g.onDeath)
 	g.snakeField.EventEat.Connect(&g, g.OnSnakeEatEvent)
 
@@ -40,9 +45,9 @@ func New() *Game {
 }
 
 func (g *Game) Update() error {
-	input.Update()
+	g.input.Update()
 	text.Update()
-	if input.IsF1Pressed() {
+	if g.input.IsActionJustPressed(input.Debug) {
 		g.isDebugVisible = !g.isDebugVisible
 	}
 
@@ -72,7 +77,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func (g *Game) onDeath(data snakeField.EventSnakeDeathData) {
-	g.snakeField = snakeField.New()
+	g.snakeField = snakeField.New(g.input)
 	g.snakeField.EventDeath.Connect(g, g.onDeath)
 	g.snakeField.EventEat.Connect(g, g.OnSnakeEatEvent)
 	g.enemy = enemy.New()
@@ -93,7 +98,7 @@ func (g *Game) onEnemyAttack(data enemy.EventAttackData) {
 }
 
 func (g *Game) onEnemyDeath(data enemy.EventDeathData) {
-	g.snakeField = snakeField.New()
+	g.snakeField = snakeField.New(g.input)
 	g.snakeField.EventDeath.Connect(g, g.onDeath)
 	g.snakeField.EventEat.Connect(g, g.OnSnakeEatEvent)
 	g.enemy = enemy.New()
