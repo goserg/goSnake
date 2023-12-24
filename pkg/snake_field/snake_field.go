@@ -1,16 +1,15 @@
 package snake_field
 
 import (
-	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"goSnake/pkg/config"
 	"goSnake/pkg/engine/signal"
 	"goSnake/pkg/image_manager"
 	"goSnake/pkg/input"
+	"goSnake/pkg/item"
 	"goSnake/pkg/snake"
 	"goSnake/pkg/utils/vector"
 	"image/color"
-	"math/rand"
 	"time"
 )
 
@@ -22,7 +21,7 @@ type SnakeField struct {
 	direction       int
 	snake           *snake.Snake
 
-	foodPos vector.Vector
+	food *item.Item
 
 	mainTicker *time.Ticker
 
@@ -47,7 +46,11 @@ func New() *SnakeField {
 		Y: 32 * 5,
 	})
 	snakeField.mainTicker = time.NewTicker(calcTick(snakeField.speed))
-	snakeField.newFood()
+	occupiedPositions := make(map[vector.Vector]struct{})
+	for _, v := range snakeField.snake.Positions() {
+		occupiedPositions[v] = struct{}{}
+	}
+	snakeField.food = item.NewFood(occupiedPositions)
 	return &snakeField
 }
 
@@ -117,10 +120,16 @@ func (sf *SnakeField) Update() error {
 		}
 
 		sf.snake.Move(newPos)
-		if sf.snake.Pos == sf.foodPos {
+
+		occupiedPositions := make(map[vector.Vector]struct{})
+		for _, v := range sf.snake.Positions() {
+			occupiedPositions[v] = struct{}{}
+		}
+
+		if sf.snake.HeadPos() == sf.food.Pos() {
 			sf.EventEat.Emit(EventEatData{Name: "lol kek"})
 			sf.snake.Grow()
-			sf.newFood()
+			sf.food = item.NewFood(occupiedPositions)
 		}
 	default:
 	}
@@ -135,32 +144,9 @@ func (sf *SnakeField) Draw(screen *ebiten.Image, opts *ebiten.DrawImageOptions) 
 	if sf.snake != nil {
 		sf.snake.Draw(snakeField, calcTick(sf.speed))
 	}
-
-	var foodDrawOptions ebiten.DrawImageOptions
-	foodDrawOptions.GeoM.Translate(sf.foodPos.X, sf.foodPos.Y)
-	snakeField.DrawImage(image_manager.Food(), &foodDrawOptions)
+	sf.food.Draw(snakeField)
 
 	screen.DrawImage(snakeField, opts)
-}
-
-func (sf *SnakeField) newFood() {
-	newFoodPos := vector.Vector{
-		X: float64(rand.Intn(config.FieldWidth/config.TileSize) * config.TileSize),
-		Y: float64(rand.Intn(config.FieldHeight/config.TileSize) * config.TileSize),
-	}
-
-	s := sf.snake
-	for s != nil {
-		if s.Pos == newFoodPos {
-			fmt.Println("collision")
-			newFoodPos = vector.Vector{
-				X: float64(rand.Intn(config.FieldWidth/config.TileSize) * config.TileSize),
-				Y: float64(rand.Intn(config.FieldHeight/config.TileSize) * config.TileSize),
-			}
-		}
-		s = s.Next
-	}
-	sf.foodPos = newFoodPos
 }
 
 func (sf *SnakeField) SpeedUp() {

@@ -107,3 +107,17 @@ func (s *Snake) Move(pos vector.Vector) {
 		s.Next.Move(s.PrevPos)
 	}
 }
+
+func (s *Snake) HeadPos() vector.Vector {
+	return s.Pos
+}
+
+func (s *Snake) Positions() []vector.Vector {
+	pos := []vector.Vector{s.Pos}
+	segment := s.Next
+	for segment != nil {
+		pos = append(pos, segment.Pos)
+		segment = segment.Next
+	}
+	return pos
+}
