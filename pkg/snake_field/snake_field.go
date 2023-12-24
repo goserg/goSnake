@@ -187,6 +187,10 @@ func (sf *SnakeField) Start() {
 	sf.isRunning = true
 }
 
+func (sf *SnakeField) Toggle() {
+	sf.isRunning = !sf.isRunning
+}
+
 func calcTick(speed int) time.Duration {
 	return (time.Second) / time.Duration(speed)
 }

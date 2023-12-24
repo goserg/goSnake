@@ -57,3 +57,7 @@ func (e *Enemy) Damage(dmg int) {
 func (e *Enemy) Start() {
 	e.isRunning = true
 }
+
+func (e *Enemy) Toggle() {
+	e.isRunning = !e.isRunning
+}

@@ -58,6 +58,11 @@ func (g *Game) Update() error {
 	if g.input.IsActionJustPressed(input.Debug) {
 		g.isDebugVisible = !g.isDebugVisible
 	}
+	if g.input.IsActionJustPressed(input.Pause) {
+		g.ui.ToggleMenu()
+		g.snakeField.Toggle()
+		g.enemy.Toggle()
+	}
 
 	if err := g.snakeField.Update(); err != nil {
 		return err

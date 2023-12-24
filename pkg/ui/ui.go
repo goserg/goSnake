@@ -57,7 +57,7 @@ func New() *UI {
 			})),
 	)
 
-	startButton := Button("start", fontFace, func(args *widget.ButtonClickedEventArgs) {
+	startButton := Button("press start", fontFace, func(args *widget.ButtonClickedEventArgs) {
 		ui.EventStartPressed.Emit(struct{}{})
 	})
 	exitButton := Button("exit", fontFace, func(args *widget.ButtonClickedEventArgs) {
@@ -103,6 +103,16 @@ func (ui *UI) Draw(screen *ebiten.Image) {
 
 func (ui *UI) HideMenu() {
 	ui.ui.Container.GetWidget().Visibility = widget.Visibility_Hide
+}
+
+func (ui *UI) ToggleMenu() {
+	switch ui.ui.Container.GetWidget().Visibility {
+	case widget.Visibility_Hide:
+		ui.ui.Container.GetWidget().Visibility = widget.Visibility_Show
+	case widget.Visibility_Show:
+		ui.ui.Container.GetWidget().Visibility = widget.Visibility_Hide
+
+	}
 }
 
 func (ui *UI) ShowMenu() {
