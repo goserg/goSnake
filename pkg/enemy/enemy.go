@@ -7,6 +7,8 @@ import (
 )
 
 type Enemy struct {
+	isRunning bool
+
 	name  string
 	maxHP int
 	HP    int
@@ -35,6 +37,9 @@ func New() *Enemy {
 }
 
 func (e *Enemy) Update() {
+	if !e.isRunning {
+		return
+	}
 	if time.Now().After(e.nextAttack) {
 		e.nextAttack = time.Now().Add(e.cooldown)
 		fmt.Printf("%s attack\n", e.name)
@@ -47,4 +52,8 @@ func (e *Enemy) Damage(dmg int) {
 	if e.HP <= 0 {
 		e.EventDeath.Emit(EventDeathData{})
 	}
+}
+
+func (e *Enemy) Start() {
+	e.isRunning = true
 }

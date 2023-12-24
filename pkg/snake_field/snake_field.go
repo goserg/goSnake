@@ -22,6 +22,8 @@ const (
 )
 
 type SnakeField struct {
+	isRunning bool
+
 	speed int
 
 	grid            *ebiten.Image
@@ -67,6 +69,9 @@ func New(inputHandler *input.Handler) *SnakeField {
 }
 
 func (sf *SnakeField) Update() error {
+	if !sf.isRunning {
+		return nil
+	}
 	switch sf.direction {
 	case Left, Right:
 		if sf.input.IsActionJustPressed(input.ActionUp) {
@@ -176,6 +181,10 @@ func (sf *SnakeField) SpeedUp() {
 
 func (sf *SnakeField) GrowSnake() {
 	sf.snake.Grow()
+}
+
+func (sf *SnakeField) Start() {
+	sf.isRunning = true
 }
 
 func calcTick(speed int) time.Duration {

@@ -9,17 +9,20 @@ import (
 	"goSnake/pkg/input"
 	snakeField "goSnake/pkg/snake_field"
 	"goSnake/pkg/text"
+	"goSnake/pkg/ui"
 	"golang.org/x/image/colornames"
 	"time"
 )
 
 type Game struct {
-	snakeField     *snakeField.SnakeField
+	snakeField *snakeField.SnakeField
+	enemy      *enemy.Enemy
+
 	isDebugVisible bool
 
 	input *input.Handler
 
-	enemy *enemy.Enemy
+	ui *ui.UI
 }
 
 func (g *Game) IsDisposed() bool {
@@ -28,6 +31,9 @@ func (g *Game) IsDisposed() bool {
 
 func New() *Game {
 	var g Game
+
+	g.ui = ui.New()
+	g.ui.EventStartPressed.Connect(&g, g.OnStartButtonPressed)
 
 	inputHandler := input.NewHandler()
 	g.input = inputHandler
@@ -45,6 +51,8 @@ func New() *Game {
 }
 
 func (g *Game) Update() error {
+	g.ui.Update()
+
 	g.input.Update()
 	text.Update()
 	if g.input.IsActionJustPressed(input.Debug) {
@@ -60,6 +68,8 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	g.ui.Draw(screen)
+
 	var snakeFieldDrawingOptions ebiten.DrawImageOptions
 	snakeFieldDrawingOptions.GeoM.Translate(config.FieldLeft, config.FieldTop)
 	g.snakeField.Draw(screen, &snakeFieldDrawingOptions)
@@ -84,6 +94,8 @@ func (g *Game) onDeath(data snakeField.EventSnakeDeathData) {
 	g.enemy.EventAttack.Connect(g, g.onEnemyAttack)
 	g.enemy.EventDeath.Connect(g, g.onEnemyDeath)
 
+	g.ui.ShowMenu()
+
 	text.New("YOU DIED", 200, 200,
 		text.WithColor(colornames.Red),
 		text.WithSize(100),
@@ -105,6 +117,8 @@ func (g *Game) onEnemyDeath(data enemy.EventDeathData) {
 	g.enemy.EventAttack.Connect(g, g.onEnemyAttack)
 	g.enemy.EventDeath.Connect(g, g.onEnemyDeath)
 
+	g.ui.ShowMenu()
+
 	text.New("YOU WIN", 200, 200,
 		text.WithColor(colornames.Greenyellow),
 		text.WithSize(100),
@@ -117,4 +131,11 @@ func (g *Game) onEnemyDeath(data enemy.EventDeathData) {
 func (g *Game) OnSnakeEatEvent(arg snakeField.EventEatData) {
 	fmt.Println("event eat", arg.Name)
 	g.enemy.Damage(10)
+}
+
+func (g *Game) OnStartButtonPressed(data struct{}) {
+	fmt.Println("start")
+	g.snakeField.Start()
+	g.enemy.Start()
+	g.ui.HideMenu()
 }
