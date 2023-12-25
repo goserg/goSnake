@@ -84,6 +84,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("TPS: %d", int(ebiten.ActualTPS())), 0, 10)
 	}
 
+	var enemyDrawingOptions ebiten.DrawImageOptions
+	enemyDrawingOptions.GeoM.Translate(700, 100)
+	g.enemy.Draw(screen, &enemyDrawingOptions)
+
 	text.Draw(screen)
 }
 
