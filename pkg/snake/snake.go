@@ -3,8 +3,8 @@ package snake
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"goSnake/pkg/config"
-	"goSnake/pkg/image_manager"
 	"goSnake/pkg/utils/vector"
+	"goSnake/resource"
 	"time"
 )
 
@@ -21,7 +21,7 @@ func New(pos vector.Vector) *Snake {
 	var snake Snake
 	snake.Pos = pos
 	snake.PrevPos = pos
-	snake.Image = image_manager.Pig()
+	snake.Image = resource.Image(resource.ImagePig)
 	return &snake
 }
 
