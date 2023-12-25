@@ -64,7 +64,7 @@ func New(inputHandler *input.Handler) *SnakeField {
 	for _, v := range snakeField.snake.Positions() {
 		occupiedPositions[v] = struct{}{}
 	}
-	snakeField.food = item.NewFood(occupiedPositions)
+	snakeField.food = item.NewSword(occupiedPositions)
 	return &snakeField
 }
 
@@ -152,9 +152,9 @@ func (sf *SnakeField) Update() error {
 		}
 
 		if sf.snake.HeadPos() == sf.food.Pos() {
-			sf.EventEat.Emit(EventEatData{Name: "lol kek"})
+			sf.EventEat.Emit(EventEatData{})
 			sf.snake.Grow()
-			sf.food = item.NewFood(occupiedPositions)
+			sf.food = item.NewSword(occupiedPositions)
 		}
 	default:
 	}

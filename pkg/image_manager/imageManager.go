@@ -3,7 +3,9 @@ package image_manager
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"goSnake/pkg/config"
+	"goSnake/resource"
 	"image/color"
+	"image/png"
 )
 
 var manager map[string]*ebiten.Image
@@ -128,4 +130,42 @@ func Grid() *ebiten.Image {
 	}
 	manager["grid"] = img
 	return img
+}
+
+func Sword() *ebiten.Image {
+	if img, ok := manager["sword"]; ok {
+		return img
+	}
+	f, err := resource.Images.Open("images/28x36.png")
+	if err != nil {
+		return nil
+	}
+	defer f.Close()
+
+	img, err := png.Decode(f)
+	if err != nil {
+		panic(err.Error())
+	}
+	eimg := ebiten.NewImageFromImage(img)
+	manager["sword"] = eimg
+	return eimg
+}
+
+func Pig() *ebiten.Image {
+	if img, ok := manager["pig"]; ok {
+		return img
+	}
+	f, err := resource.Images.Open("images/94x16.png")
+	if err != nil {
+		return nil
+	}
+	defer f.Close()
+
+	img, err := png.Decode(f)
+	if err != nil {
+		panic(err.Error())
+	}
+	eimg := ebiten.NewImageFromImage(img)
+	manager["pig"] = eimg
+	return eimg
 }
