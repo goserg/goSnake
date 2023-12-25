@@ -11,12 +11,14 @@ const (
 	ImageSkeleton ImageTag = iota + 1
 	ImagePig
 	ImageSword
+	ImageRock
 )
 
 var imageMap = map[ImageTag]string{
 	ImageSkeleton: "74x17.png",
 	ImagePig:      "94x16.png",
 	ImageSword:    "28x36.png",
+	ImageRock:     "28x18.png",
 }
 
 var imageCache map[ImageTag]*ebiten.Image

@@ -34,7 +34,18 @@ type EventDeathData struct {
 type EventTakeDamageData struct {
 	Value int
 }
+
+type AttackType int
+
+const (
+	AttackTypeRock AttackType = iota + 1
+	AttackTypeGrow
+	AttackTypeSpeedUp
+	AttackTypeSlowDown
+)
+
 type EventAttackData struct {
+	AttackType AttackType
 }
 
 func New() *Enemy {
@@ -57,7 +68,9 @@ func (e *Enemy) Update() {
 	if time.Now().After(e.nextAttack) {
 		e.nextAttack = time.Now().Add(e.cooldown)
 		fmt.Printf("%s attack\n", e.name)
-		e.EventAttack.Emit(EventAttackData{})
+		e.EventAttack.Emit(EventAttackData{
+			AttackType: AttackTypeRock,
+		})
 	}
 }
 

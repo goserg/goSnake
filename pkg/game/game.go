@@ -7,6 +7,7 @@ import (
 	"goSnake/pkg/config"
 	"goSnake/pkg/enemy"
 	"goSnake/pkg/input"
+	"goSnake/pkg/item"
 	snakeField "goSnake/pkg/snake_field"
 	"goSnake/pkg/text"
 	"goSnake/pkg/ui"
@@ -117,7 +118,12 @@ func (g *Game) onDeath(data snakeField.EventSnakeDeathData) {
 }
 
 func (g *Game) onEnemyAttack(data enemy.EventAttackData) {
-	g.snakeField.GrowSnake()
+	switch data.AttackType {
+	case enemy.AttackTypeRock:
+		g.snakeField.SpawnRock()
+	case enemy.AttackTypeGrow:
+		g.snakeField.GrowSnake()
+	}
 }
 
 func (g *Game) onEnemyDeath(data enemy.EventDeathData) {
@@ -141,8 +147,12 @@ func (g *Game) onEnemyDeath(data enemy.EventDeathData) {
 }
 
 func (g *Game) OnSnakeEatEvent(arg snakeField.EventEatData) {
-	fmt.Println("event eat", arg.Name)
-	g.enemy.Damage(10)
+	switch arg.Type {
+	case item.TypeSword:
+		g.enemy.Damage(10)
+	case item.TypeRock:
+		g.onDeath(snakeField.EventSnakeDeathData{})
+	}
 }
 
 func (g *Game) OnStartButtonPressed(data struct{}) {

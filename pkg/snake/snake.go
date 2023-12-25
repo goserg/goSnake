@@ -1,6 +1,7 @@
 package snake
 
 import (
+	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"goSnake/pkg/config"
 	"goSnake/pkg/utils/vector"
@@ -26,6 +27,7 @@ func New(pos vector.Vector) *Snake {
 }
 
 func (s *Snake) Grow() {
+	fmt.Println("snake grow")
 	if s.Next != nil {
 		s.Next.Grow()
 		return

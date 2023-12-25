@@ -1,6 +1,7 @@
 package snake_field
 
 import (
+	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"goSnake/pkg/config"
 	"goSnake/pkg/engine/signal"
@@ -31,7 +32,7 @@ type SnakeField struct {
 	direction       int
 	snake           *snake.Snake
 
-	food *item.Item
+	items []*item.Item
 
 	mainTicker *time.Ticker
 
@@ -42,7 +43,7 @@ type SnakeField struct {
 }
 
 type EventEatData struct {
-	Name string
+	Type item.Type
 }
 
 type EventSnakeDeathData struct {
@@ -60,12 +61,20 @@ func New(inputHandler *input.Handler) *SnakeField {
 		Y: 32 * 5,
 	})
 	snakeField.mainTicker = time.NewTicker(calcTick(snakeField.speed))
+	occupiedPositions := snakeField.findOccupiedPositions()
+	snakeField.items = append(snakeField.items, item.NewSword(occupiedPositions))
+	return &snakeField
+}
+
+func (sf *SnakeField) findOccupiedPositions() map[vector.Vector]struct{} {
 	occupiedPositions := make(map[vector.Vector]struct{})
-	for _, v := range snakeField.snake.Positions() {
+	for _, v := range sf.snake.Positions() {
 		occupiedPositions[v] = struct{}{}
 	}
-	snakeField.food = item.NewSword(occupiedPositions)
-	return &snakeField
+	for _, item := range sf.items {
+		occupiedPositions[item.Pos()] = struct{}{}
+	}
+	return occupiedPositions
 }
 
 func (sf *SnakeField) Update() error {
@@ -151,10 +160,21 @@ func (sf *SnakeField) Update() error {
 			occupiedPositions[v] = struct{}{}
 		}
 
-		if sf.snake.HeadPos() == sf.food.Pos() {
-			sf.EventEat.Emit(EventEatData{})
-			sf.snake.Grow()
-			sf.food = item.NewSword(occupiedPositions)
+		for i := range sf.items {
+			if sf.snake.HeadPos() == sf.items[i].Pos() {
+				switch sf.items[i].Type {
+				case item.TypeSword:
+					sf.EventEat.Emit(EventEatData{
+						Type: sf.items[i].Type,
+					})
+					sf.snake.Grow()
+					sf.items[i] = item.NewSword(occupiedPositions)
+				case item.TypeRock:
+					sf.EventEat.Emit(EventEatData{
+						Type: sf.items[i].Type,
+					})
+				}
+			}
 		}
 	default:
 	}
@@ -169,7 +189,9 @@ func (sf *SnakeField) Draw(screen *ebiten.Image, opts *ebiten.DrawImageOptions) 
 	if sf.snake != nil {
 		sf.snake.Draw(snakeField, calcTick(sf.speed))
 	}
-	sf.food.Draw(snakeField)
+	for _, item := range sf.items {
+		item.Draw(snakeField)
+	}
 
 	screen.DrawImage(snakeField, opts)
 }
@@ -189,6 +211,12 @@ func (sf *SnakeField) Start() {
 
 func (sf *SnakeField) Toggle() {
 	sf.isRunning = !sf.isRunning
+}
+
+func (sf *SnakeField) SpawnRock() {
+	fmt.Println("rock spawned")
+	sf.items = append(sf.items, item.NewRock(sf.findOccupiedPositions()))
+
 }
 
 func calcTick(speed int) time.Duration {
