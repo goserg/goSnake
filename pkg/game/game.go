@@ -47,6 +47,7 @@ func New() *Game {
 	g.enemy = enemy.New()
 	g.enemy.EventAttack.Connect(&g, g.onEnemyAttack)
 	g.enemy.EventDeath.Connect(&g, g.onEnemyDeath)
+	g.enemy.EventTakeDamage.Connect(&g, g.onEnemyTakeDamage)
 	return &g
 }
 
@@ -102,6 +103,7 @@ func (g *Game) onDeath(data snakeField.EventSnakeDeathData) {
 	g.enemy = enemy.New()
 	g.enemy.EventAttack.Connect(g, g.onEnemyAttack)
 	g.enemy.EventDeath.Connect(g, g.onEnemyDeath)
+	g.enemy.EventTakeDamage.Connect(g, g.onEnemyTakeDamage)
 
 	g.ui.ShowMenu()
 
@@ -125,6 +127,7 @@ func (g *Game) onEnemyDeath(data enemy.EventDeathData) {
 	g.enemy = enemy.New()
 	g.enemy.EventAttack.Connect(g, g.onEnemyAttack)
 	g.enemy.EventDeath.Connect(g, g.onEnemyDeath)
+	g.enemy.EventTakeDamage.Connect(g, g.onEnemyTakeDamage)
 
 	g.ui.ShowMenu()
 
@@ -147,4 +150,13 @@ func (g *Game) OnStartButtonPressed(data struct{}) {
 	g.snakeField.Start()
 	g.enemy.Start()
 	g.ui.HideMenu()
+}
+
+func (g *Game) onEnemyTakeDamage(data enemy.EventTakeDamageData) {
+	text.New(fmt.Sprintf("-%d", data.Value), 700, 100,
+		text.WithColor(colornames.Red),
+		text.WithSize(14),
+		text.WithMove(0, -0.5),
+		text.WithLifespan(time.Second),
+	)
 }

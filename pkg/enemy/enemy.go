@@ -24,11 +24,15 @@ type Enemy struct {
 	cooldown   time.Duration
 	nextAttack time.Time
 
-	EventDeath  signal.Event[EventDeathData]
-	EventAttack signal.Event[EventAttackData]
+	EventDeath      signal.Event[EventDeathData]
+	EventTakeDamage signal.Event[EventTakeDamageData]
+	EventAttack     signal.Event[EventAttackData]
 }
 
 type EventDeathData struct {
+}
+type EventTakeDamageData struct {
+	Value int
 }
 type EventAttackData struct {
 }
@@ -60,6 +64,7 @@ func (e *Enemy) Update() {
 func (e *Enemy) Damage(dmg int) {
 	e.HP -= dmg
 	e.healthBar.Set(e.HP * 100 / e.maxHP)
+	e.EventTakeDamage.Emit(EventTakeDamageData{Value: dmg})
 	if e.HP <= 0 {
 		e.EventDeath.Emit(EventDeathData{})
 	}
