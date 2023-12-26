@@ -76,12 +76,12 @@ func New(str string, posX float64, posY float64, opts ...textOption) {
 
 	holder.image = img
 	holder.opts = &ebiten.DrawImageOptions{}
-	holder.opts.GeoM.Translate(posX, posY)
 	holder.id = uuid.New()
 	holder.animations = o.animations
 	if o.lifeSpan > 0 {
 		holder.destroyTime = time.Now().Add(o.lifeSpan)
 	}
+	holder.opts.GeoM.Translate(posX, posY)
 
 	textManager.texts[holder.id] = &holder
 }

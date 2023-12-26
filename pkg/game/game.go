@@ -14,6 +14,7 @@ import (
 	"goSnake/pkg/utils/vector"
 	"goSnake/resource"
 	"golang.org/x/image/colornames"
+	"strconv"
 	"time"
 )
 
@@ -45,7 +46,8 @@ func New() *Game {
 
 	g.snakeField = snakeField.New(g.input)
 	g.snakeField.EventDeath.Connect(&g, g.onDeath)
-	g.snakeField.EventEat.Connect(&g, g.OnSnakeEatEvent)
+	g.snakeField.EventEat.Connect(&g, g.onSnakeEatEvent)
+	g.snakeField.EventItemSpawned.Connect(&g, g.onItemSpawned)
 
 	g.enemy = enemy.New()
 	g.enemy.EventAttack.Connect(&g, g.onEnemyAttack)
@@ -106,7 +108,9 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 func (g *Game) onDeath(data snakeField.EventSnakeDeathData) {
 	g.snakeField = snakeField.New(g.input)
 	g.snakeField.EventDeath.Connect(g, g.onDeath)
-	g.snakeField.EventEat.Connect(g, g.OnSnakeEatEvent)
+	g.snakeField.EventEat.Connect(g, g.onSnakeEatEvent)
+	g.snakeField.EventItemSpawned.Connect(g, g.onItemSpawned)
+
 	g.enemy = enemy.New()
 	g.enemy.EventAttack.Connect(g, g.onEnemyAttack)
 	g.enemy.EventDeath.Connect(g, g.onEnemyDeath)
@@ -135,7 +139,9 @@ func (g *Game) onEnemyAttack(data enemy.EventAttackData) {
 func (g *Game) onEnemyDeath(data enemy.EventDeathData) {
 	g.snakeField = snakeField.New(g.input)
 	g.snakeField.EventDeath.Connect(g, g.onDeath)
-	g.snakeField.EventEat.Connect(g, g.OnSnakeEatEvent)
+	g.snakeField.EventEat.Connect(g, g.onSnakeEatEvent)
+	g.snakeField.EventItemSpawned.Connect(g, g.onItemSpawned)
+
 	g.enemy = enemy.New()
 	g.enemy.EventAttack.Connect(g, g.onEnemyAttack)
 	g.enemy.EventDeath.Connect(g, g.onEnemyDeath)
@@ -152,7 +158,7 @@ func (g *Game) onEnemyDeath(data enemy.EventDeathData) {
 	)
 }
 
-func (g *Game) OnSnakeEatEvent(arg snakeField.EventEatData) {
+func (g *Game) onSnakeEatEvent(arg snakeField.EventEatData) {
 	switch arg.Type {
 	case item.TypeSword:
 		g.enemy.Damage(5)
@@ -207,10 +213,19 @@ func (g *Game) OnStartButtonPressed(data struct{}) {
 }
 
 func (g *Game) onEnemyTakeDamage(data enemy.EventTakeDamageData) {
-	text.New(fmt.Sprintf("-%d", data.Value), 900, 100,
-		text.WithColor(colornames.Red),
-		text.WithSize(14),
+	text.New(strconv.Itoa(data.Value), 912, 75,
+		text.WithColor(colornames.Yellow),
+		text.WithSize(16),
 		text.WithMove(0, -0.5),
 		text.WithLifespan(time.Second),
+	)
+}
+
+func (g *Game) onItemSpawned(data snakeField.EventItemSpawnedData) {
+	text.New("rock!", data.Pos.X+config.FieldLeft, data.Pos.Y+config.FieldTop,
+		text.WithLifespan(time.Second),
+		text.WithSize(16),
+		text.WithColor(colornames.Red),
+		text.WithMove(0, -0.5),
 	)
 }

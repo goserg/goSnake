@@ -37,8 +37,14 @@ type SnakeField struct {
 
 	input *input.Handler
 
-	EventEat   signal.Event[EventEatData]
-	EventDeath signal.Event[EventSnakeDeathData]
+	EventEat         signal.Event[EventEatData]
+	EventDeath       signal.Event[EventSnakeDeathData]
+	EventItemSpawned signal.Event[EventItemSpawnedData]
+}
+
+type EventItemSpawnedData struct {
+	ItemType item.Type
+	Pos      vector.Vector
 }
 
 type EventEatData struct {
@@ -211,8 +217,12 @@ func (sf *SnakeField) Toggle() {
 }
 
 func (sf *SnakeField) SpawnRock() {
-	sf.items = append(sf.items, item.NewRock(sf.findOccupiedPositions()))
-
+	newRock := item.NewRock(sf.findOccupiedPositions())
+	sf.items = append(sf.items, newRock)
+	sf.EventItemSpawned.Emit(EventItemSpawnedData{
+		ItemType: item.TypeRock,
+		Pos:      newRock.Pos(),
+	})
 }
 
 func calcTick(speed int) time.Duration {
