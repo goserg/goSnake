@@ -1,7 +1,6 @@
 package snake_field
 
 import (
-	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"goSnake/pkg/config"
 	"goSnake/pkg/engine/signal"
@@ -155,11 +154,6 @@ func (sf *SnakeField) Update() error {
 
 		sf.snake.Move(newPos)
 
-		occupiedPositions := make(map[vector.Vector]struct{})
-		for _, v := range sf.snake.Positions() {
-			occupiedPositions[v] = struct{}{}
-		}
-
 		for i := range sf.items {
 			if sf.snake.HeadPos() == sf.items[i].Pos() {
 				switch sf.items[i].Type {
@@ -168,7 +162,7 @@ func (sf *SnakeField) Update() error {
 						Type: sf.items[i].Type,
 					})
 					sf.snake.Grow()
-					sf.items[i] = item.NewSword(occupiedPositions)
+					sf.items[i] = item.NewSword(sf.findOccupiedPositions())
 				case item.TypeRock:
 					sf.EventEat.Emit(EventEatData{
 						Type: sf.items[i].Type,
@@ -214,7 +208,6 @@ func (sf *SnakeField) Toggle() {
 }
 
 func (sf *SnakeField) SpawnRock() {
-	fmt.Println("rock spawned")
 	sf.items = append(sf.items, item.NewRock(sf.findOccupiedPositions()))
 
 }

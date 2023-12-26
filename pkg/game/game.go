@@ -149,7 +149,7 @@ func (g *Game) onEnemyDeath(data enemy.EventDeathData) {
 func (g *Game) OnSnakeEatEvent(arg snakeField.EventEatData) {
 	switch arg.Type {
 	case item.TypeSword:
-		g.enemy.Damage(10)
+		g.enemy.Damage(5)
 	case item.TypeRock:
 		g.onDeath(snakeField.EventSnakeDeathData{})
 	}

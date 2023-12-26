@@ -1,7 +1,6 @@
 package input
 
 import (
-	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
@@ -26,18 +25,18 @@ func (h *Handler) Update() {
 			h.id = int(g)
 		}
 	}
-	pressed := inpututil.AppendJustPressedGamepadButtons(ebiten.GamepadID(h.id), []ebiten.GamepadButton{})
-	if len(pressed) != 0 {
-		for _, keys := range h.keymap {
-			for _, key := range keys {
-				for _, button := range pressed {
-					if int(button) == key.code {
-						fmt.Println(key.name)
-					}
-				}
-			}
-		}
-	}
+	//pressed := inpututil.AppendJustPressedGamepadButtons(ebiten.GamepadID(h.id), []ebiten.GamepadButton{})
+	//if len(pressed) != 0 {
+	//	for _, keys := range h.keymap {
+	//		for _, key := range keys {
+	//			for _, button := range pressed {
+	//				if int(button) == key.code {
+	//					fmt.Println(key.name)
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 }
 
 func (h *Handler) IsActionJustPressed(action Action) bool {
