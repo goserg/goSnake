@@ -60,12 +60,15 @@ func New(inputHandler *input.Handler) *SnakeField {
 
 	snakeField.input = inputHandler
 
-	snakeField.speed = 5
+	snakeField.speed = 10
 	snakeField.grid = image_manager.Grid()
 	snakeField.snake = snake.New(vector.Vector{
 		X: 32 * 5,
 		Y: 32 * 5,
 	})
+	snakeField.snake.Grow()
+	snakeField.snake.Grow()
+
 	snakeField.mainTicker = time.NewTicker(calcTick(snakeField.speed))
 	occupiedPositions := snakeField.findOccupiedPositions()
 	snakeField.items = append(snakeField.items, item.NewSword(occupiedPositions))
@@ -169,13 +172,18 @@ func (sf *SnakeField) Update() error {
 						Type: sf.items[i].Type,
 						Pos:  sf.items[i].Pos(),
 					})
-					sf.snake.Grow()
 					sf.items[i] = item.NewSword(sf.findOccupiedPositions())
 				case item.TypeRock:
-					sf.EventEat.Emit(EventEatData{
-						Type: sf.items[i].Type,
-						Pos:  sf.items[i].Pos(),
-					})
+					if sf.snake.Next == nil {
+						sf.EventEat.Emit(EventEatData{
+							Type: sf.items[i].Type,
+							Pos:  sf.items[i].Pos(),
+						})
+						return nil
+					}
+					sf.items = append(sf.items[:i], sf.items[i+1:]...)
+					sf.snake = sf.snake.Next
+					return nil
 				}
 			}
 		}

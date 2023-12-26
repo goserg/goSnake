@@ -228,4 +228,10 @@ func (g *Game) onItemSpawned(data snakeField.EventItemSpawnedData) {
 		text.WithColor(colornames.Red),
 		text.WithMove(0, -0.5),
 	)
+	text.New("rock spawned", 900, 100,
+		text.WithLifespan(time.Second),
+		text.WithSize(16),
+		text.WithColor(colornames.White),
+		text.WithMove(0, 0.5),
+	)
 }
