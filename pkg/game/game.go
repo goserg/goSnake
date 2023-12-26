@@ -11,6 +11,8 @@ import (
 	snakeField "goSnake/pkg/snake_field"
 	"goSnake/pkg/text"
 	"goSnake/pkg/ui"
+	"goSnake/pkg/utils/vector"
+	"goSnake/resource"
 	"golang.org/x/image/colornames"
 	"time"
 )
@@ -87,10 +89,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	var enemyDrawingOptions ebiten.DrawImageOptions
-	enemyDrawingOptions.GeoM.Translate(700, 100)
+	enemyDrawingOptions.GeoM.Translate(900, 100)
 	g.enemy.Draw(screen, &enemyDrawingOptions)
 
 	text.Draw(screen)
+
+	if m != nil {
+		m.Draw(screen)
+	}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -150,10 +156,48 @@ func (g *Game) OnSnakeEatEvent(arg snakeField.EventEatData) {
 	switch arg.Type {
 	case item.TypeSword:
 		g.enemy.Damage(5)
+
+		m = &Missile{
+			img: resource.Image(resource.ImageSword),
+			startPos: vector.Vector{
+				X: arg.Pos.X + config.FieldLeft,
+				Y: arg.Pos.Y + config.FieldTop,
+			},
+			startTime: time.Now(),
+			targetPos: vector.Vector{
+				X: 900 + config.TileSize,
+				Y: 100 + config.TileSize,
+			},
+			speed: time.Second / 5,
+		}
 	case item.TypeRock:
 		g.onDeath(snakeField.EventSnakeDeathData{})
 	}
 }
+
+type Missile struct {
+	img       *ebiten.Image
+	startPos  vector.Vector
+	startTime time.Time
+	targetPos vector.Vector
+	speed     time.Duration
+}
+
+func (m2 *Missile) Draw(screen *ebiten.Image) {
+	nowTime := time.Now().Sub(m2.startTime)
+	movedPart := float64(nowTime) / float64(m2.speed)
+	prevPos := m2.startPos
+	var visualPos vector.Vector
+	visualPos.X = prevPos.X + (m2.targetPos.X-prevPos.X)*movedPart
+	visualPos.Y = prevPos.Y + (m2.targetPos.Y-prevPos.Y)*movedPart
+
+	var snakeDrawOptions ebiten.DrawImageOptions
+	snakeDrawOptions.GeoM.Rotate(movedPart * 4)
+	snakeDrawOptions.GeoM.Translate(visualPos.X, visualPos.Y)
+	screen.DrawImage(m2.img, &snakeDrawOptions)
+}
+
+var m *Missile
 
 func (g *Game) OnStartButtonPressed(data struct{}) {
 	fmt.Println("start")
@@ -163,7 +207,7 @@ func (g *Game) OnStartButtonPressed(data struct{}) {
 }
 
 func (g *Game) onEnemyTakeDamage(data enemy.EventTakeDamageData) {
-	text.New(fmt.Sprintf("-%d", data.Value), 700, 100,
+	text.New(fmt.Sprintf("-%d", data.Value), 900, 100,
 		text.WithColor(colornames.Red),
 		text.WithSize(14),
 		text.WithMove(0, -0.5),

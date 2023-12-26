@@ -43,6 +43,7 @@ type SnakeField struct {
 
 type EventEatData struct {
 	Type item.Type
+	Pos  vector.Vector
 }
 
 type EventSnakeDeathData struct {
@@ -53,7 +54,7 @@ func New(inputHandler *input.Handler) *SnakeField {
 
 	snakeField.input = inputHandler
 
-	snakeField.speed = 10
+	snakeField.speed = 5
 	snakeField.grid = image_manager.Grid()
 	snakeField.snake = snake.New(vector.Vector{
 		X: 32 * 5,
@@ -160,12 +161,14 @@ func (sf *SnakeField) Update() error {
 				case item.TypeSword:
 					sf.EventEat.Emit(EventEatData{
 						Type: sf.items[i].Type,
+						Pos:  sf.items[i].Pos(),
 					})
 					sf.snake.Grow()
 					sf.items[i] = item.NewSword(sf.findOccupiedPositions())
 				case item.TypeRock:
 					sf.EventEat.Emit(EventEatData{
 						Type: sf.items[i].Type,
+						Pos:  sf.items[i].Pos(),
 					})
 				}
 			}
