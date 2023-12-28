@@ -31,7 +31,8 @@ type SnakeField struct {
 	direction       int
 	snake           *snake.Snake
 
-	items []*item.Item
+	items     []*item.Item
+	backItems []*item.Item
 
 	mainTicker *time.Ticker
 
@@ -181,8 +182,10 @@ func (sf *SnakeField) Update() error {
 						})
 						return nil
 					}
+					rockPos := sf.items[i].Pos()
 					sf.items = append(sf.items[:i], sf.items[i+1:]...)
 					sf.snake = sf.snake.Next
+					sf.backItems = append(sf.backItems, item.NewBlood(rockPos))
 					return nil
 				}
 			}
@@ -195,6 +198,10 @@ func (sf *SnakeField) Update() error {
 func (sf *SnakeField) Draw(screen *ebiten.Image, opts *ebiten.DrawImageOptions) {
 	snakeField := ebiten.NewImage(config.FieldWidth+1, config.FieldHeight+1)
 	snakeField.Fill(color.RGBA{R: 10, G: 10, B: 10})
+
+	for _, item := range sf.backItems {
+		item.Draw(snakeField)
+	}
 
 	snakeField.DrawImage(sf.grid, nil)
 	if sf.snake != nil {

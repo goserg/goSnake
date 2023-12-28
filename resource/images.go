@@ -12,6 +12,7 @@ const (
 	ImagePig
 	ImageSword
 	ImageRock
+	ImageBlood
 )
 
 var imageMap = map[ImageTag]string{
@@ -19,6 +20,7 @@ var imageMap = map[ImageTag]string{
 	ImagePig:      "94x16.png",
 	ImageSword:    "28x36.png",
 	ImageRock:     "28x18.png",
+	ImageBlood:    "51x23.png",
 }
 
 var imageCache map[ImageTag]*ebiten.Image
