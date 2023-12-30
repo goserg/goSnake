@@ -5,14 +5,15 @@ import (
 	"image/png"
 )
 
-type ImageTag int
+type ImageTag string
 
 const (
-	ImageSkeleton ImageTag = iota + 1
-	ImagePig
-	ImageSword
-	ImageRock
-	ImageBlood
+	ImageSkeleton ImageTag = "skeleton"
+	ImagePig               = "pig"
+	ImageSword             = "sword"
+	ImageRock              = "rock"
+	ImageBlood             = "blood"
+	ImagePlusOne           = "plus_one"
 )
 
 var imageMap = map[ImageTag]string{
@@ -21,6 +22,7 @@ var imageMap = map[ImageTag]string{
 	ImageSword:    "28x36.png",
 	ImageRock:     "28x18.png",
 	ImageBlood:    "51x23.png",
+	ImagePlusOne:  "58x55.png",
 }
 
 var imageCache map[ImageTag]*ebiten.Image

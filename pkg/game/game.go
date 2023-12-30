@@ -7,6 +7,7 @@ import (
 	"goSnake/pkg/config"
 	"goSnake/pkg/enemy"
 	"goSnake/pkg/input"
+	"goSnake/pkg/inventory"
 	"goSnake/pkg/item"
 	snakeField "goSnake/pkg/snake_field"
 	"goSnake/pkg/text"
@@ -19,6 +20,7 @@ import (
 )
 
 type Game struct {
+	inventory  *inventory.Inventory
 	snakeField *snakeField.SnakeField
 	enemy      *enemy.Enemy
 
@@ -36,6 +38,8 @@ func (g *Game) IsDisposed() bool {
 func New() *Game {
 	var g Game
 
+	g.inventory = &inventory.Inventory{Items: []item.Type{item.TypeFood, item.TypeFood}}
+
 	g.ui = ui.New()
 	g.ui.EventStartPressed.Connect(&g, g.OnStartButtonPressed)
 
@@ -48,6 +52,9 @@ func New() *Game {
 	g.snakeField.EventDeath.Connect(&g, g.onDeath)
 	g.snakeField.EventEat.Connect(&g, g.onSnakeEatEvent)
 	g.snakeField.EventItemSpawned.Connect(&g, g.onItemSpawned)
+	for _, itemType := range g.inventory.Items {
+		g.snakeField.SpawnItem(itemType)
+	}
 
 	g.enemy = enemy.New()
 	g.enemy.EventAttack.Connect(&g, g.onEnemyAttack)
@@ -110,6 +117,9 @@ func (g *Game) onDeath(data snakeField.EventSnakeDeathData) {
 	g.snakeField.EventDeath.Connect(g, g.onDeath)
 	g.snakeField.EventEat.Connect(g, g.onSnakeEatEvent)
 	g.snakeField.EventItemSpawned.Connect(g, g.onItemSpawned)
+	for _, itemType := range g.inventory.Items {
+		g.snakeField.SpawnItem(itemType)
+	}
 
 	g.enemy = enemy.New()
 	g.enemy.EventAttack.Connect(g, g.onEnemyAttack)
@@ -130,7 +140,7 @@ func (g *Game) onDeath(data snakeField.EventSnakeDeathData) {
 func (g *Game) onEnemyAttack(data enemy.EventAttackData) {
 	switch data.AttackType {
 	case enemy.AttackTypeRock:
-		g.snakeField.SpawnRock()
+		g.snakeField.SpawnItem(item.TypeRock)
 	case enemy.AttackTypeGrow:
 		g.snakeField.GrowSnake()
 	}
@@ -141,6 +151,9 @@ func (g *Game) onEnemyDeath(data enemy.EventDeathData) {
 	g.snakeField.EventDeath.Connect(g, g.onDeath)
 	g.snakeField.EventEat.Connect(g, g.onSnakeEatEvent)
 	g.snakeField.EventItemSpawned.Connect(g, g.onItemSpawned)
+	for _, itemType := range g.inventory.Items {
+		g.snakeField.SpawnItem(itemType)
+	}
 
 	g.enemy = enemy.New()
 	g.enemy.EventAttack.Connect(g, g.onEnemyAttack)
@@ -178,6 +191,8 @@ func (g *Game) onSnakeEatEvent(arg snakeField.EventEatData) {
 		}
 	case item.TypeRock:
 		g.onDeath(snakeField.EventSnakeDeathData{})
+	case item.TypeFood:
+		g.snakeField.GrowSnake()
 	}
 }
 
@@ -222,16 +237,13 @@ func (g *Game) onEnemyTakeDamage(data enemy.EventTakeDamageData) {
 }
 
 func (g *Game) onItemSpawned(data snakeField.EventItemSpawnedData) {
-	text.New("rock!", data.Pos.X+config.FieldLeft, data.Pos.Y+config.FieldTop,
-		text.WithLifespan(time.Second),
-		text.WithSize(16),
-		text.WithColor(colornames.Red),
-		text.WithMove(0, -0.5),
-	)
-	text.New("rock spawned", 900, 100,
-		text.WithLifespan(time.Second),
-		text.WithSize(16),
-		text.WithColor(colornames.White),
-		text.WithMove(0, 0.5),
-	)
+	switch data.ItemType {
+	case item.TypeRock:
+		text.New("rock!", data.Pos.X+config.FieldLeft, data.Pos.Y+config.FieldTop,
+			text.WithLifespan(time.Second),
+			text.WithSize(16),
+			text.WithColor(colornames.Red),
+			text.WithMove(0, -0.5),
+		)
+	}
 }

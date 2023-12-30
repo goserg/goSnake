@@ -168,6 +168,13 @@ func (sf *SnakeField) Update() error {
 		for i := range sf.items {
 			if sf.snake.HeadPos() == sf.items[i].Pos() {
 				switch sf.items[i].Type {
+				case item.TypeFood:
+					sf.EventEat.Emit(EventEatData{
+						Type: sf.items[i].Type,
+						Pos:  sf.items[i].Pos(),
+					})
+					sf.items = append(sf.items[:i], sf.items[i+1:]...)
+					return nil
 				case item.TypeSword:
 					sf.EventEat.Emit(EventEatData{
 						Type: sf.items[i].Type,
@@ -231,13 +238,23 @@ func (sf *SnakeField) Toggle() {
 	sf.isRunning = !sf.isRunning
 }
 
-func (sf *SnakeField) SpawnRock() {
-	newRock := item.NewRock(sf.findOccupiedPositions())
-	sf.items = append(sf.items, newRock)
-	sf.EventItemSpawned.Emit(EventItemSpawnedData{
-		ItemType: item.TypeRock,
-		Pos:      newRock.Pos(),
-	})
+func (sf *SnakeField) SpawnItem(itemType item.Type) {
+	switch itemType {
+	case item.TypeRock:
+		newRock := item.NewRock(sf.findOccupiedPositions())
+		sf.items = append(sf.items, newRock)
+		sf.EventItemSpawned.Emit(EventItemSpawnedData{
+			ItemType: item.TypeRock,
+			Pos:      newRock.Pos(),
+		})
+	case item.TypeFood:
+		newItem := item.NewFood(sf.findOccupiedPositions())
+		sf.items = append(sf.items, newItem)
+		sf.EventItemSpawned.Emit(EventItemSpawnedData{
+			ItemType: item.TypeFood,
+			Pos:      newItem.Pos(),
+		})
+	}
 }
 
 func calcTick(speed int) time.Duration {

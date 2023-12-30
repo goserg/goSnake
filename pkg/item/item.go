@@ -3,8 +3,8 @@ package item
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"goSnake/pkg/config"
-	"goSnake/pkg/image_manager"
 	"goSnake/pkg/utils/vector"
+	"goSnake/resource"
 	"math/rand"
 )
 
@@ -18,7 +18,9 @@ func NewFood(occupiedPositions map[vector.Vector]struct{}) *Item {
 	var food Item
 	food.findPosition(occupiedPositions)
 
-	food.img = image_manager.Food()
+	foodImg := ebiten.NewImageFromImage(resource.Image(resource.ImagePig))
+	foodImg.DrawImage(resource.Image(resource.ImagePlusOne), nil)
+	food.img = foodImg
 	food.Type = TypeFood
 
 	return &food

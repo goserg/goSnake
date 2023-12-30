@@ -3,11 +3,9 @@ package enemy
 import (
 	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
+	"goSnake/pkg/engine/signal"
 	"goSnake/pkg/ui"
 	"goSnake/resource"
-
-	//"github.com/hajimehoshi/ebiten/v2"
-	"goSnake/pkg/engine/signal"
 	"time"
 )
 
