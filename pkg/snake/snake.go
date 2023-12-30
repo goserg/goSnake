@@ -35,6 +35,9 @@ func (s *Snake) Grow() {
 
 func (s *Snake) Draw(screen *ebiten.Image, tick time.Duration) {
 	nowTime := time.Now().Sub(s.MoveStarted)
+	if nowTime > tick {
+		nowTime = tick
+	}
 	movedPart := float64(nowTime) / float64(tick)
 
 	prevPos := s.PrevPos
