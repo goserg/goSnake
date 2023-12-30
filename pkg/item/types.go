@@ -6,4 +6,5 @@ const (
 	TypeFood = iota + 1
 	TypeSword
 	TypeRock
+	TypePotionSpeedUp
 )

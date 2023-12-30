@@ -45,7 +45,7 @@ func New() *Game {
 }
 
 func initGame(g *Game) {
-	g.inventory = &inventory.Inventory{Items: []item.Type{item.TypeFood, item.TypeFood}}
+	g.inventory = &inventory.Inventory{Items: []item.Type{item.TypeFood, item.TypeFood, item.TypePotionSpeedUp, item.TypePotionSpeedUp, item.TypePotionSpeedUp, item.TypePotionSpeedUp}}
 
 	g.ui = ui.New()
 	g.ui.EventStartPressed.Connect(g, g.OnStartButtonPressed)
@@ -178,6 +178,14 @@ func (g *Game) onSnakeEatEvent(arg snakeField.EventEatData) {
 		g.onDeath(snakeField.EventSnakeDeathData{})
 	case item.TypeFood:
 		g.snakeField.GrowSnake()
+	case item.TypePotionSpeedUp:
+		g.snakeField.SpeedUp()
+		text.New("speed up", arg.Pos.X, arg.Pos.Y,
+			text.WithColor(colornames.Blue),
+			text.WithSize(16),
+			text.WithMove(0, -0.5),
+			text.WithLifespan(time.Second),
+		)
 	}
 }
 

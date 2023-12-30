@@ -61,7 +61,7 @@ func New(inputHandler *input.Handler) *SnakeField {
 
 	snakeField.input = inputHandler
 
-	snakeField.speed = 10
+	snakeField.speed = 5
 	snakeField.grid = image_manager.Grid()
 	snakeField.snake = snake.New(vector.Vector{
 		X: 32 * 5,
@@ -168,6 +168,13 @@ func (sf *SnakeField) Update(delta time.Duration) error {
 		for i := range sf.items {
 			if sf.snake.HeadPos() == sf.items[i].Pos() {
 				switch sf.items[i].Type {
+				case item.TypePotionSpeedUp:
+					sf.EventEat.Emit(EventEatData{
+						Type: sf.items[i].Type,
+						Pos:  sf.items[i].Pos(),
+					})
+					sf.items = append(sf.items[:i], sf.items[i+1:]...)
+					return nil
 				case item.TypeFood:
 					sf.EventEat.Emit(EventEatData{
 						Type: sf.items[i].Type,
@@ -252,6 +259,13 @@ func (sf *SnakeField) SpawnItem(itemType item.Type) {
 		sf.items = append(sf.items, newItem)
 		sf.EventItemSpawned.Emit(EventItemSpawnedData{
 			ItemType: item.TypeFood,
+			Pos:      newItem.Pos(),
+		})
+	case item.TypePotionSpeedUp:
+		newItem := item.NewPotionSpeedUp(sf.findOccupiedPositions())
+		sf.items = append(sf.items, newItem)
+		sf.EventItemSpawned.Emit(EventItemSpawnedData{
+			ItemType: item.TypePotionSpeedUp,
 			Pos:      newItem.Pos(),
 		})
 	}

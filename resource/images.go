@@ -8,21 +8,25 @@ import (
 type ImageTag string
 
 const (
-	ImageSkeleton ImageTag = "skeleton"
-	ImagePig               = "pig"
-	ImageSword             = "sword"
-	ImageRock              = "rock"
-	ImageBlood             = "blood"
-	ImagePlusOne           = "plus_one"
+	ImageSkeleton   ImageTag = "skeleton"
+	ImagePig                 = "pig"
+	ImageSword               = "sword"
+	ImageRock                = "rock"
+	ImageBlood               = "blood"
+	ImagePlusOne             = "plus_one"
+	ImageSpeedUp             = "speed_ip"
+	ImagePotionBlue          = "image_potion_blue"
 )
 
 var imageMap = map[ImageTag]string{
-	ImageSkeleton: "74x17.png",
-	ImagePig:      "94x16.png",
-	ImageSword:    "28x36.png",
-	ImageRock:     "28x18.png",
-	ImageBlood:    "51x23.png",
-	ImagePlusOne:  "58x55.png",
+	ImageSkeleton:   "74x17.png",
+	ImagePig:        "94x16.png",
+	ImageSword:      "28x36.png",
+	ImageRock:       "28x18.png",
+	ImageBlood:      "51x23.png",
+	ImagePlusOne:    "58x55.png",
+	ImageSpeedUp:    "56x44.png",
+	ImagePotionBlue: "42x28.png",
 }
 
 var imageCache map[ImageTag]*ebiten.Image
