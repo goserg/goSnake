@@ -87,7 +87,7 @@ func (sf *SnakeField) findOccupiedPositions() map[vector.Vector]struct{} {
 	return occupiedPositions
 }
 
-func (sf *SnakeField) Update() error {
+func (sf *SnakeField) Update(delta time.Duration) error {
 	if !sf.isRunning {
 		return nil
 	}

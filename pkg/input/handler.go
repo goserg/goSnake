@@ -3,6 +3,7 @@ package input
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"time"
 )
 
 type Handler struct {
@@ -19,7 +20,7 @@ func NewHandler() *Handler {
 	return &handler
 }
 
-func (h *Handler) Update() {
+func (h *Handler) Update(delta time.Duration) {
 	if h.id == 0 {
 		for _, g := range ebiten.AppendGamepadIDs([]ebiten.GamepadID{}) {
 			h.id = int(g)

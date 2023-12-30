@@ -12,6 +12,7 @@ import (
 	"image/color"
 	"log"
 	"os"
+	"time"
 )
 
 type UI struct {
@@ -93,7 +94,7 @@ func Button(text string, fontFace font.Face, handler func(args *widget.ButtonCli
 	)
 }
 
-func (ui *UI) Update() {
+func (ui *UI) Update(delta time.Duration) {
 	ui.ui.Update()
 }
 

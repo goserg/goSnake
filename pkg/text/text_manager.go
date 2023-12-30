@@ -7,6 +7,7 @@ import (
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 	"log"
+	"time"
 )
 
 type tm struct {
@@ -39,7 +40,7 @@ func Draw(screen *ebiten.Image) {
 	}
 }
 
-func Update() {
+func Update(delta time.Duration) {
 	var toDelete []uuid.UUID
 	for id, holder := range textManager.texts {
 		if holder.Update() {

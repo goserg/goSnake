@@ -29,6 +29,8 @@ type Game struct {
 	input *input.Handler
 
 	ui *ui.UI
+
+	lastFrameTime time.Time
 }
 
 func (g *Game) IsDisposed() bool {
@@ -38,10 +40,15 @@ func (g *Game) IsDisposed() bool {
 func New() *Game {
 	var g Game
 
+	initGame(&g)
+	return &g
+}
+
+func initGame(g *Game) {
 	g.inventory = &inventory.Inventory{Items: []item.Type{item.TypeFood, item.TypeFood}}
 
 	g.ui = ui.New()
-	g.ui.EventStartPressed.Connect(&g, g.OnStartButtonPressed)
+	g.ui.EventStartPressed.Connect(g, g.OnStartButtonPressed)
 
 	inputHandler := input.NewHandler()
 	g.input = inputHandler
@@ -49,25 +56,29 @@ func New() *Game {
 	g.isDebugVisible = true
 
 	g.snakeField = snakeField.New(g.input)
-	g.snakeField.EventDeath.Connect(&g, g.onDeath)
-	g.snakeField.EventEat.Connect(&g, g.onSnakeEatEvent)
-	g.snakeField.EventItemSpawned.Connect(&g, g.onItemSpawned)
+	g.snakeField.EventDeath.Connect(g, g.onDeath)
+	g.snakeField.EventEat.Connect(g, g.onSnakeEatEvent)
+	g.snakeField.EventItemSpawned.Connect(g, g.onItemSpawned)
 	for _, itemType := range g.inventory.Items {
 		g.snakeField.SpawnItem(itemType)
 	}
 
 	g.enemy = enemy.New()
-	g.enemy.EventAttack.Connect(&g, g.onEnemyAttack)
-	g.enemy.EventDeath.Connect(&g, g.onEnemyDeath)
-	g.enemy.EventTakeDamage.Connect(&g, g.onEnemyTakeDamage)
-	return &g
+	g.enemy.EventAttack.Connect(g, g.onEnemyAttack)
+	g.enemy.EventDeath.Connect(g, g.onEnemyDeath)
+	g.enemy.EventTakeDamage.Connect(g, g.onEnemyTakeDamage)
+
+	g.lastFrameTime = time.Now()
 }
 
 func (g *Game) Update() error {
-	g.ui.Update()
+	delta := time.Since(g.lastFrameTime)
+	g.lastFrameTime = time.Now()
 
-	g.input.Update()
-	text.Update()
+	g.ui.Update(delta)
+
+	g.input.Update(delta)
+	text.Update(delta)
 	if g.input.IsActionJustPressed(input.Debug) {
 		g.isDebugVisible = !g.isDebugVisible
 	}
@@ -77,11 +88,11 @@ func (g *Game) Update() error {
 		g.enemy.Toggle()
 	}
 
-	if err := g.snakeField.Update(); err != nil {
+	if err := g.snakeField.Update(delta); err != nil {
 		return err
 	}
 
-	g.enemy.Update()
+	g.enemy.Update(delta)
 	return nil
 }
 
@@ -113,20 +124,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func (g *Game) onDeath(data snakeField.EventSnakeDeathData) {
-	g.snakeField = snakeField.New(g.input)
-	g.snakeField.EventDeath.Connect(g, g.onDeath)
-	g.snakeField.EventEat.Connect(g, g.onSnakeEatEvent)
-	g.snakeField.EventItemSpawned.Connect(g, g.onItemSpawned)
-	for _, itemType := range g.inventory.Items {
-		g.snakeField.SpawnItem(itemType)
-	}
-
-	g.enemy = enemy.New()
-	g.enemy.EventAttack.Connect(g, g.onEnemyAttack)
-	g.enemy.EventDeath.Connect(g, g.onEnemyDeath)
-	g.enemy.EventTakeDamage.Connect(g, g.onEnemyTakeDamage)
-
-	g.ui.ShowMenu()
+	initGame(g)
 
 	text.New("YOU DIED", 200, 200,
 		text.WithColor(colornames.Red),
@@ -147,20 +145,7 @@ func (g *Game) onEnemyAttack(data enemy.EventAttackData) {
 }
 
 func (g *Game) onEnemyDeath(data enemy.EventDeathData) {
-	g.snakeField = snakeField.New(g.input)
-	g.snakeField.EventDeath.Connect(g, g.onDeath)
-	g.snakeField.EventEat.Connect(g, g.onSnakeEatEvent)
-	g.snakeField.EventItemSpawned.Connect(g, g.onItemSpawned)
-	for _, itemType := range g.inventory.Items {
-		g.snakeField.SpawnItem(itemType)
-	}
-
-	g.enemy = enemy.New()
-	g.enemy.EventAttack.Connect(g, g.onEnemyAttack)
-	g.enemy.EventDeath.Connect(g, g.onEnemyDeath)
-	g.enemy.EventTakeDamage.Connect(g, g.onEnemyTakeDamage)
-
-	g.ui.ShowMenu()
+	initGame(g)
 
 	text.New("YOU WIN", 200, 200,
 		text.WithColor(colornames.Greenyellow),

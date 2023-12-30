@@ -20,7 +20,7 @@ type Enemy struct {
 	healthBar *ui.HealthBar
 
 	cooldown   time.Duration
-	nextAttack time.Time
+	nextAttack time.Duration
 
 	EventDeath      signal.Event[EventDeathData]
 	EventTakeDamage signal.Event[EventTakeDamageData]
@@ -54,17 +54,18 @@ func New() *Enemy {
 	enemy.img = resource.Image(resource.ImageSkeleton)
 	enemy.healthBar = ui.NewHealthBar()
 	enemy.cooldown = time.Second * 2
-	enemy.nextAttack = time.Now().Add(enemy.cooldown)
+	enemy.nextAttack = enemy.cooldown
 
 	return &enemy
 }
 
-func (e *Enemy) Update() {
+func (e *Enemy) Update(delta time.Duration) {
 	if !e.isRunning {
 		return
 	}
-	if time.Now().After(e.nextAttack) {
-		e.nextAttack = time.Now().Add(e.cooldown)
+	e.nextAttack -= delta
+	if e.nextAttack < 0 {
+		e.nextAttack = e.cooldown
 		fmt.Printf("%s attack\n", e.name)
 		e.EventAttack.Emit(EventAttackData{
 			AttackType: AttackTypeRock,
