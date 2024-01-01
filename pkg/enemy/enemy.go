@@ -2,11 +2,13 @@ package enemy
 
 import (
 	"fmt"
+	"time"
+
+	"github.com/goserg/zg/signal"
+
 	"github.com/hajimehoshi/ebiten/v2"
-	"goSnake/pkg/engine/signal"
 	"goSnake/pkg/ui"
 	"goSnake/resource"
-	"time"
 )
 
 type Enemy struct {
