@@ -1,9 +1,10 @@
 package item
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
-	"goSnake/pkg/utils/vector"
+	"github.com/goserg/zg/vector"
 	"goSnake/resource"
+
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func NewPotionSpeedUp(occupiedPositions map[vector.Vector]struct{}) *Item {

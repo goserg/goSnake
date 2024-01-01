@@ -2,6 +2,11 @@ package game
 
 import (
 	"fmt"
+	"strconv"
+	"time"
+
+	"github.com/goserg/zg/vector"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"goSnake/pkg/config"
@@ -12,11 +17,8 @@ import (
 	snakeField "goSnake/pkg/snake_field"
 	"goSnake/pkg/text"
 	"goSnake/pkg/ui"
-	"goSnake/pkg/utils/vector"
 	"goSnake/resource"
 	"golang.org/x/image/colornames"
-	"strconv"
-	"time"
 )
 
 type Game struct {

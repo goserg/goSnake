@@ -1,11 +1,13 @@
 package snake
 
 import (
+	"time"
+
+	"github.com/goserg/zg/vector"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"goSnake/pkg/config"
-	"goSnake/pkg/utils/vector"
 	"goSnake/resource"
-	"time"
 )
 
 type Snake struct {

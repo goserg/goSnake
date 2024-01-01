@@ -1,7 +1,7 @@
 package item
 
 import (
-	"goSnake/pkg/utils/vector"
+	"github.com/goserg/zg/vector"
 	"goSnake/resource"
 )
 

@@ -1,11 +1,13 @@
 package item
 
 import (
+	"math/rand"
+
+	"github.com/goserg/zg/vector"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"goSnake/pkg/config"
-	"goSnake/pkg/utils/vector"
 	"goSnake/resource"
-	"math/rand"
 )
 
 type Item struct {

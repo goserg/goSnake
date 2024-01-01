@@ -1,18 +1,20 @@
 package ui
 
 import (
+	"image/color"
+	"log"
+	"os"
+	"time"
+
+	"github.com/goserg/zg/signal"
+
 	"github.com/ebitenui/ebitenui"
 	"github.com/ebitenui/ebitenui/image"
 	"github.com/ebitenui/ebitenui/widget"
 	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten/v2"
-	"goSnake/pkg/engine/signal"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/gofont/goregular"
-	"image/color"
-	"log"
-	"os"
-	"time"
 )
 
 type UI struct {

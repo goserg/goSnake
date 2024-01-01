@@ -1,14 +1,14 @@
 package snake_field
 
 import (
+	"github.com/goserg/zg/signal"
+	"github.com/goserg/zg/vector"
 	"github.com/hajimehoshi/ebiten/v2"
 	"goSnake/pkg/config"
-	"goSnake/pkg/engine/signal"
 	"goSnake/pkg/image_manager"
 	"goSnake/pkg/input"
 	"goSnake/pkg/item"
 	"goSnake/pkg/snake"
-	"goSnake/pkg/utils/vector"
 	"image/color"
 	"time"
 )
