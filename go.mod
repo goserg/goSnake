@@ -6,7 +6,7 @@ require (
 	github.com/ebitenui/ebitenui v0.5.5
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/google/uuid v1.5.0
-	github.com/goserg/zg v0.0.0-20240101205704-34055d6dd0a6
+	github.com/goserg/zg v0.0.1
 	github.com/hajimehoshi/ebiten/v2 v2.6.3
 	golang.org/x/image v0.12.0
 )
