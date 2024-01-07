@@ -45,12 +45,12 @@ type SnakeField struct {
 
 type EventItemSpawnedData struct {
 	ItemType item.Type
-	Pos      vector.Vector
+	Pos      vector.Vector[float64]
 }
 
 type EventEatData struct {
 	Type item.Type
-	Pos  vector.Vector
+	Pos  vector.Vector[float64]
 }
 
 type EventSnakeDeathData struct {
@@ -63,7 +63,7 @@ func New(inputHandler *input.Handler) *SnakeField {
 
 	snakeField.speed = 5
 	snakeField.grid = image_manager.Grid()
-	snakeField.snake = snake.New(vector.Vector{
+	snakeField.snake = snake.New(vector.Vector[float64]{
 		X: 32 * 5,
 		Y: 32 * 5,
 	})
@@ -76,8 +76,8 @@ func New(inputHandler *input.Handler) *SnakeField {
 	return &snakeField
 }
 
-func (sf *SnakeField) findOccupiedPositions() map[vector.Vector]struct{} {
-	occupiedPositions := make(map[vector.Vector]struct{})
+func (sf *SnakeField) findOccupiedPositions() map[vector.Vector[float64]]struct{} {
+	occupiedPositions := make(map[vector.Vector[float64]]struct{})
 	for _, v := range sf.snake.Positions() {
 		occupiedPositions[v] = struct{}{}
 	}
@@ -120,25 +120,25 @@ func (sf *SnakeField) Update(delta time.Duration) error {
 		if sf.direction == No {
 			sf.direction = Right
 		}
-		var newPos vector.Vector
+		var newPos vector.Vector[float64]
 		switch sf.direction {
 		case Left:
-			newPos = vector.Vector{
+			newPos = vector.Vector[float64]{
 				X: sf.snake.Pos.X - 32,
 				Y: sf.snake.Pos.Y,
 			}
 		case Right:
-			newPos = vector.Vector{
+			newPos = vector.Vector[float64]{
 				X: sf.snake.Pos.X + 32,
 				Y: sf.snake.Pos.Y,
 			}
 		case Up:
-			newPos = vector.Vector{
+			newPos = vector.Vector[float64]{
 				X: sf.snake.Pos.X,
 				Y: sf.snake.Pos.Y - 32,
 			}
 		case Down:
-			newPos = vector.Vector{
+			newPos = vector.Vector[float64]{
 				X: sf.snake.Pos.X,
 				Y: sf.snake.Pos.Y + 32,
 			}

@@ -5,7 +5,7 @@ import (
 	"goSnake/resource"
 )
 
-func NewBlood(pos vector.Vector) *Item {
+func NewBlood(pos vector.Vector[float64]) *Item {
 	var blood Item
 	blood.position = pos
 	blood.img = resource.Image(resource.ImageBlood)

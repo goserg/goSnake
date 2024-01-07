@@ -12,11 +12,11 @@ import (
 
 type Item struct {
 	Type     Type
-	position vector.Vector
+	position vector.Vector[float64]
 	img      *ebiten.Image
 }
 
-func NewFood(occupiedPositions map[vector.Vector]struct{}) *Item {
+func NewFood(occupiedPositions map[vector.Vector[float64]]struct{}) *Item {
 	var food Item
 	food.findPosition(occupiedPositions)
 
@@ -28,11 +28,11 @@ func NewFood(occupiedPositions map[vector.Vector]struct{}) *Item {
 	return &food
 }
 
-func (i *Item) findPosition(occupiedPositions map[vector.Vector]struct{}) {
+func (i *Item) findPosition(occupiedPositions map[vector.Vector[float64]]struct{}) {
 	var redoThisMethodCounter int
 	for redoThisMethodCounter < 1000 {
 		redoThisMethodCounter++
-		i.position = vector.Vector{
+		i.position = vector.Vector[float64]{
 			X: float64(rand.Intn(config.FieldWidth/config.TileSize) * config.TileSize),
 			Y: float64(rand.Intn(config.FieldHeight/config.TileSize) * config.TileSize),
 		}
@@ -49,6 +49,6 @@ func (i *Item) Draw(screen *ebiten.Image) {
 	screen.DrawImage(i.img, &foodDrawOptions)
 }
 
-func (i *Item) Pos() vector.Vector {
+func (i *Item) Pos() vector.Vector[float64] {
 	return i.position
 }

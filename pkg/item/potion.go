@@ -7,7 +7,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-func NewPotionSpeedUp(occupiedPositions map[vector.Vector]struct{}) *Item {
+func NewPotionSpeedUp(occupiedPositions map[vector.Vector[float64]]struct{}) *Item {
 	var potion Item
 	potion.findPosition(occupiedPositions)
 

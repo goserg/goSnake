@@ -165,12 +165,12 @@ func (g *Game) onSnakeEatEvent(arg snakeField.EventEatData) {
 
 		m = &Missile{
 			img: resource.Image(resource.ImageSword),
-			startPos: vector.Vector{
+			startPos: vector.Vector[float64]{
 				X: arg.Pos.X + config.FieldLeft,
 				Y: arg.Pos.Y + config.FieldTop,
 			},
 			startTime: time.Now(),
-			targetPos: vector.Vector{
+			targetPos: vector.Vector[float64]{
 				X: 900 + config.TileSize,
 				Y: 100 + config.TileSize,
 			},
@@ -193,9 +193,9 @@ func (g *Game) onSnakeEatEvent(arg snakeField.EventEatData) {
 
 type Missile struct {
 	img       *ebiten.Image
-	startPos  vector.Vector
+	startPos  vector.Vector[float64]
 	startTime time.Time
-	targetPos vector.Vector
+	targetPos vector.Vector[float64]
 	speed     time.Duration
 }
 
@@ -203,7 +203,7 @@ func (m2 *Missile) Draw(screen *ebiten.Image) {
 	nowTime := time.Now().Sub(m2.startTime)
 	movedPart := float64(nowTime) / float64(m2.speed)
 	prevPos := m2.startPos
-	var visualPos vector.Vector
+	var visualPos vector.Vector[float64]
 	visualPos.X = prevPos.X + (m2.targetPos.X-prevPos.X)*movedPart
 	visualPos.Y = prevPos.Y + (m2.targetPos.Y-prevPos.Y)*movedPart
 
